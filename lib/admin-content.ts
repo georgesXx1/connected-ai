@@ -173,6 +173,24 @@ export function deriveTitle(chunk: string, index: number) {
   return `Rule ${index + 1}`;
 }
 
+function buildRulesFromOriginalRulebook() {
+  const chunks = readLegacyRulesText()
+    .split(/\n\s*\n/)
+    .map((chunk) => normalizeText(chunk))
+    .filter(Boolean);
+  const timestamp = nowIso();
+
+  return chunks.map((chunk, index) => ({
+    id: `rule-${String(index + 1).padStart(3, "0")}`,
+    title: deriveTitle(chunk, index),
+    arabicText: chunk,
+    category: inferCategory(chunk),
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    status: "published" as const,
+  }));
+}
+
 function createPublicInfoEntry(
   key: PublicInfoKey,
   title: LocalizedContent,
@@ -588,8 +606,16 @@ function sanitizeGradeInfo(
 
 async function readAdminRules() {
   try {
-    const rules = (await kv.get<AdminRule[]>(ADMIN_RULES_KEY)) || [];
-    return Array.isArray(rules) ? rules.map(sanitizeRule) : [];
+    const rules = await kv.get<AdminRule[]>(ADMIN_RULES_KEY);
+
+    if (Array.isArray(rules) && rules.length > 0) {
+      return rules.map(sanitizeRule);
+    }
+
+    const seededRules = buildRulesFromOriginalRulebook().map(sanitizeRule);
+    await kv.set(ADMIN_RULES_KEY, seededRules);
+
+    return seededRules;
   } catch {
     return [];
   }
