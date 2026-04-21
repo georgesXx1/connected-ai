@@ -27,7 +27,7 @@ export default async function AdministrationPage({
   const resolvedSearchParams = await searchParams;
   const language = normalizeLanguage(getSingleParam(resolvedSearchParams.lang));
   const username = await getAdminSessionUser();
-  const initialContent = username ? readAdminContent() : null;
+  const initialContent = username ? await readAdminContent() : null;
 
   return (
     <AdminPortal

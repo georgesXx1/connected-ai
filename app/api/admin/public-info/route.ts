@@ -97,7 +97,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  const content = readAdminContent();
+  const content = await readAdminContent();
   return NextResponse.json({
     publicInfo: content.publicInfo,
     gradeInfo: content.gradeInfo,
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const content = saveAdminPublicInfo(publicInfo, gradeInfo);
+  const content = await saveAdminPublicInfo(publicInfo, gradeInfo);
   revalidatePath("/", "page");
   revalidatePath("/administration", "page");
   revalidatePath("/guest", "page");

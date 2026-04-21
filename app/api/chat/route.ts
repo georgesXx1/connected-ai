@@ -1515,7 +1515,7 @@ Extra instructions:
   `.trim();
 }
 
-function getRelevantRuleHintsForMode(
+async function getRelevantRuleHintsForMode(
   mode: ChatMode,
   latestQuestion: string,
 ) {
@@ -1523,7 +1523,7 @@ function getRelevantRuleHintsForMode(
     return [];
   }
 
-  const rawRelevantRuleHints = findRelevantRuleChunks(
+  const rawRelevantRuleHints = await findRelevantRuleChunks(
     latestQuestion,
     mode === "rules" ? 8 : 4,
   );
@@ -1561,8 +1561,8 @@ function buildRulesFallback(
   return `**${labels.rulesLabels.according}:**\n${quoteBlock}\n\n**${labels.rulesLabels.explanation}:**\n${explanation}\n\n**${labels.rulesLabels.conclusion}:**\n${conclusion}`;
 }
 
-function getPublishedAdminRulesContext() {
-  const publishedRules = getPublishedRules();
+async function getPublishedAdminRulesContext() {
+  const publishedRules = await getPublishedRules();
 
   if (publishedRules.length === 0) {
     return "No updated admin-published rules are currently available.";
@@ -1589,14 +1589,15 @@ function tokenizeLoose(text: string) {
     .filter((token) => token.length >= 3);
 }
 
-function findBestPublishedAdminRuleForQuestion(question: string) {
+async function findBestPublishedAdminRuleForQuestion(question: string) {
   const questionTokens = new Set(tokenizeLoose(question));
   const questionHints = extractTopicHints(question);
+  const publishedRules = await getPublishedRules();
 
   let bestRuleText: string | null = null;
   let bestScore = 0;
 
-  for (const rule of getPublishedRules()) {
+  for (const rule of publishedRules) {
     const searchable = [rule.title, rule.category, rule.arabicText].join("\n");
     const searchableLower = searchable.toLowerCase();
     const ruleTokens = new Set(tokenizeLoose(searchable));
@@ -1777,9 +1778,9 @@ function gradeMatchesAge(grade: GradePublicInfo, age: number) {
   return age >= minAge && age <= maxAge;
 }
 
-function findGuestGrade(question: string) {
+async function findGuestGrade(question: string) {
   const normalizedQuestion = normalizeGuestLookupText(question);
-  const grades = getGradePublicInfo();
+  const grades = await getGradePublicInfo();
   const age = extractGuestAge(question);
   const gradeNumbers = extractGuestGradeNumbers(question);
   const gradeMatch = grades.find((grade) =>
@@ -1815,14 +1816,14 @@ function formatGuestBookList(grade: GradePublicInfo) {
     : "No active books are listed for this grade right now.";
 }
 
-function buildGuestQuestionContext(mode: ChatMode, latestQuestion: string) {
+async function buildGuestQuestionContext(mode: ChatMode, latestQuestion: string) {
   if (!mode.startsWith("guest_")) {
     return "";
   }
 
   const isAdmissions = mode === "guest_admissions";
   const detectedAge = extractGuestAge(latestQuestion);
-  const matchedGrade = isAdmissions ? findGuestGrade(latestQuestion) : null;
+  const matchedGrade = isAdmissions ? await findGuestGrade(latestQuestion) : null;
 
   if (!isAdmissions) {
     return `
@@ -1867,13 +1868,13 @@ Latest admissions question analysis:
   `.trim();
 }
 
-function buildGuestFallbackReply(
+async function buildGuestFallbackReply(
   mode: ChatMode,
   language: Language,
   latestQuestion: string,
 ) {
   const isAdmissions = mode === "guest_admissions";
-  const requestedGrade = isAdmissions ? findGuestGrade(latestQuestion) : null;
+  const requestedGrade = isAdmissions ? await findGuestGrade(latestQuestion) : null;
 
   if (!isAdmissions && asksAboutAdmissionsTuition(latestQuestion)) {
     if (language === "fr") {
@@ -1944,7 +1945,7 @@ function buildGuestFallbackReply(
   return `For "${latestQuestion}", a family should generally expect a structured school environment with clear routines, adult supervision, communication with parents, academic follow-up, and support when a student needs help adjusting. If you are comparing schools, I would ask about the daily schedule, classroom support, family communication, safety, activities, and how the school handles student concerns. For exact official details, such as a specific schedule, contact, or procedure, confirm the final point with the school administration.`;
 }
 
-function buildFallbackReply(
+async function buildFallbackReply(
   messages: ChatMessage[],
   mode: ChatMode,
   language: Language,
@@ -1952,7 +1953,7 @@ function buildFallbackReply(
   const latestQuestion = getLastUserMessage(messages);
   const labels = LANGUAGE_CONFIG[language];
   const relevantChunks = latestQuestion
-    ? sanitizeRuleChunks(findRelevantRuleChunks(latestQuestion, 4))
+    ? sanitizeRuleChunks(await findRelevantRuleChunks(latestQuestion, 4))
     : [];
 
   if (mode.startsWith("guest_")) {
@@ -2094,7 +2095,7 @@ function buildFallbackReply(
       : null;
   const directPublishedRule =
     mode === "rules" && latestQuestion
-      ? findBestPublishedAdminRuleForQuestion(latestQuestion)
+      ? await findBestPublishedAdminRuleForQuestion(latestQuestion)
       : null;
 
     const indirectChunk =
@@ -2289,7 +2290,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      reply: buildFallbackReply(messages, mode, language),
+      reply: await buildFallbackReply(messages, mode, language),
       fallback: true,
       fallbackReason: "missing_api_key",
     });
@@ -2297,7 +2298,7 @@ export async function POST(request: Request) {
 
   const systemPrompt = buildSystemPrompt(mode, language);
   let contextPrompt = "";
-  const relevantRuleHints = getRelevantRuleHintsForMode(mode, latestQuestion);
+  const relevantRuleHints = await getRelevantRuleHintsForMode(mode, latestQuestion);
 
   if (mode === "teacher_activity" || mode === "teacher_grades") {
     contextPrompt = `
@@ -2308,8 +2309,8 @@ Answer the teacher's latest message only, while considering the conversation con
     `.trim();
   } else {
     if (mode.startsWith("guest_")) {
-      const guestPublicInfo = getGuestPublicInfoContext(mode);
-      const guestQuestionContext = buildGuestQuestionContext(mode, latestQuestion);
+      const guestPublicInfo = await getGuestPublicInfoContext(mode);
+      const guestQuestionContext = await buildGuestQuestionContext(mode, latestQuestion);
 
       contextPrompt = `
 Official public school information:
@@ -2347,9 +2348,9 @@ Answer the user's latest message only, while considering the conversation contex
         }
       }
 
-      const schoolRules = getSchoolRulesText();
+      const schoolRules = await getSchoolRulesText();
       const publishedAdminRulesContext =
-        mode === "rules" ? getPublishedAdminRulesContext() : "";
+        mode === "rules" ? await getPublishedAdminRulesContext() : "";
 
       logDebugBlock("SELECTED RULE CHUNKS", relevantRuleHints);
 
@@ -2407,7 +2408,7 @@ ${contextPrompt}
     }
 
     return NextResponse.json({
-      reply: buildFallbackReply(messages, mode, language),
+      reply: await buildFallbackReply(messages, mode, language),
       fallback: true,
       fallbackReason: "model_request_failed",
     });

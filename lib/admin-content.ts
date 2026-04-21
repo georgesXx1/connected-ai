@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { kv } from "@vercel/kv";
 
 export type AdminRuleStatus = "draft" | "published" | "trashed";
 
@@ -66,8 +67,9 @@ export type AdminContent = {
   updatedAt: string;
 };
 
-const ADMIN_CONTENT_PATH = path.join(process.cwd(), "data", "admin-content.json");
 const LEGACY_RULES_PATH = path.join(process.cwd(), "data", "school_rules.txt");
+const ADMIN_RULES_KEY = "admin_rules";
+const PUBLIC_INFO_KEY = "public_info";
 
 const PUBLIC_INFO_KEYS: PublicInfoKey[] = [
   "overview",
@@ -104,7 +106,11 @@ function nowIso() {
 }
 
 function readLegacyRulesText() {
-  return fs.readFileSync(LEGACY_RULES_PATH, "utf8");
+  try {
+    return fs.readFileSync(LEGACY_RULES_PATH, "utf8");
+  } catch {
+    return "";
+  }
 }
 
 function normalizeText(text: string) {
@@ -119,7 +125,7 @@ function mergeTextBlocks(...parts: Array<string | undefined>) {
   return [...new Set(nextParts)].join("\n\n");
 }
 
-function inferCategory(text: string) {
+export function inferCategory(text: string) {
   if (/تغيب|تأخر|غياب|دوام|attendance|absence|lateness/i.test(text)) {
     return "Attendance";
   }
@@ -151,7 +157,7 @@ function inferCategory(text: string) {
   return "General";
 }
 
-function deriveTitle(chunk: string, index: number) {
+export function deriveTitle(chunk: string, index: number) {
   const firstLine = chunk.split("\n")[0]?.trim() || "";
   const numberedTitle = firstLine.match(/^\d+\s*[-–]\s*(.+?)(:)?$/);
 
@@ -165,25 +171,6 @@ function deriveTitle(chunk: string, index: number) {
   }
 
   return `Rule ${index + 1}`;
-}
-
-function buildDefaultRules() {
-  const chunks = readLegacyRulesText()
-    .split(/\n\s*\n/)
-    .map((chunk) => normalizeText(chunk))
-    .filter(Boolean);
-
-  const timestamp = nowIso();
-
-  return chunks.map((chunk, index) => ({
-    id: `rule-${String(index + 1).padStart(3, "0")}`,
-    title: deriveTitle(chunk, index),
-    arabicText: chunk,
-    category: inferCategory(chunk),
-    createdAt: timestamp,
-    updatedAt: timestamp,
-    status: "published" as const,
-  }));
 }
 
 function createPublicInfoEntry(
@@ -308,9 +295,8 @@ function buildDefaultGradeInfo(): GradePublicInfo[] {
   }));
 }
 
-function buildDefaultAdminContent(): AdminContent {
+function buildDefaultPublicContent(): Omit<AdminContent, "rules"> {
   return {
-    rules: buildDefaultRules(),
     publicInfo: buildDefaultPublicInfo(),
     gradeInfo: buildDefaultGradeInfo(),
     updatedAt: nowIso(),
@@ -600,97 +586,90 @@ function sanitizeGradeInfo(
   });
 }
 
-function isAdminContent(value: unknown): value is AdminContent {
-  if (!value || typeof value !== "object") {
-    return false;
+async function readAdminRules() {
+  try {
+    const rules = (await kv.get<AdminRule[]>(ADMIN_RULES_KEY)) || [];
+    return Array.isArray(rules) ? rules.map(sanitizeRule) : [];
+  } catch {
+    return [];
   }
-
-  const candidate = value as Partial<AdminContent>;
-
-  return Array.isArray(candidate.rules) && !!candidate.publicInfo;
 }
 
-export function readAdminContent() {
-  if (!fs.existsSync(ADMIN_CONTENT_PATH)) {
-    return buildDefaultAdminContent();
-  }
+async function readAdminPublicContent(): Promise<Omit<AdminContent, "rules">> {
+  const defaults = buildDefaultPublicContent();
 
   try {
-    const raw = fs.readFileSync(ADMIN_CONTENT_PATH, "utf8");
-    const parsed = JSON.parse(raw) as unknown;
+    const content = await kv.get<Partial<Omit<AdminContent, "rules">>>(PUBLIC_INFO_KEY);
 
-    if (!isAdminContent(parsed)) {
-      return buildDefaultAdminContent();
+    if (!content || typeof content !== "object") {
+      return defaults;
     }
 
-    const rules = parsed.rules.map(sanitizeRule);
-    const publicInfo = sanitizePublicInfo(parsed.publicInfo);
-    const gradeInfo = sanitizeGradeInfo(
-      (parsed as Partial<AdminContent>).gradeInfo,
-    );
+    const publicInfo = sanitizePublicInfo(content.publicInfo);
+    const gradeInfo = sanitizeGradeInfo(content.gradeInfo, defaults.gradeInfo);
 
     return {
-      rules,
       publicInfo,
       gradeInfo,
-      updatedAt:
-        typeof parsed.updatedAt === "string" ? parsed.updatedAt : nowIso(),
+      updatedAt: typeof content.updatedAt === "string" ? content.updatedAt : defaults.updatedAt,
     };
   } catch {
-    return buildDefaultAdminContent();
+    return defaults;
   }
 }
 
-function ensureContentDirectory() {
-  fs.mkdirSync(path.dirname(ADMIN_CONTENT_PATH), { recursive: true });
+export async function readAdminContent() {
+  const [rules, publicContent] = await Promise.all([
+    readAdminRules(),
+    readAdminPublicContent(),
+  ]);
+
+  return {
+    rules,
+    publicInfo: publicContent.publicInfo,
+    gradeInfo: publicContent.gradeInfo,
+    updatedAt: publicContent.updatedAt,
+  };
 }
 
-export function writeAdminContent(content: AdminContent) {
-  ensureContentDirectory();
-  fs.writeFileSync(ADMIN_CONTENT_PATH, JSON.stringify(content, null, 2), "utf8");
-}
-
-export function saveAdminRules(rules: AdminRule[]) {
-  const current = readAdminContent();
+export async function saveAdminRules(rules: AdminRule[]) {
   const updatedRules = rules.map(sanitizeRule);
 
-  const nextContent: AdminContent = {
-    ...current,
-    rules: updatedRules,
-    updatedAt: nowIso(),
-  };
-
-  writeAdminContent(nextContent);
-  return nextContent;
+  await kv.set(ADMIN_RULES_KEY, updatedRules);
+  return readAdminContent();
 }
 
-export function saveAdminPublicInfo(
+export async function saveAdminPublicInfo(
   publicInfo: AdminPublicInfo,
   gradeInfo?: GradePublicInfo[],
 ) {
-  const current = readAdminContent();
+  const current = await readAdminContent();
 
-  const nextContent: AdminContent = {
-    ...current,
+  const nextPublicContent: Omit<AdminContent, "rules"> = {
     publicInfo: sanitizePublicInfo(publicInfo),
     gradeInfo: sanitizeGradeInfo(gradeInfo ?? current.gradeInfo, current.gradeInfo),
     updatedAt: nowIso(),
   };
 
-  writeAdminContent(nextContent);
-  return nextContent;
+  await kv.set(PUBLIC_INFO_KEY, nextPublicContent);
+
+  return {
+    ...nextPublicContent,
+    rules: current.rules,
+  };
 }
 
-export function getPublishedRules() {
-  return readAdminContent().rules.filter((rule) => rule.status === "published");
+export async function getPublishedRules() {
+  const rules = await readAdminRules();
+  return rules.filter((rule) => rule.status === "published");
 }
 
 export function getOriginalRulebookText() {
   return readLegacyRulesText();
 }
 
-export function getPublishedRulesText() {
-  const publishedRules = getPublishedRules();
+export async function getPublishedRulesText() {
+  const publishedRules = await getPublishedRules();
 
   if (publishedRules.length === 0) {
     return readLegacyRulesText();
@@ -699,8 +678,8 @@ export function getPublishedRulesText() {
   return publishedRules.map((rule) => rule.arabicText).join("\n\n");
 }
 
-export function getGuestPublicInfoContext(mode: string) {
-  const content = readAdminContent();
+export async function getGuestPublicInfoContext(mode: string) {
+  const content = await readAdminContent();
   const publicInfo = content.publicInfo;
 
   const sectionMap: Record<string, PublicInfoKey[]> = {
@@ -756,6 +735,7 @@ export function getGuestPublicInfoContext(mode: string) {
   ].join("\n\n");
 }
 
-export function getGradePublicInfo() {
-  return readAdminContent().gradeInfo;
+export async function getGradePublicInfo() {
+  const publicContent = await readAdminPublicContent();
+  return publicContent.gradeInfo;
 }

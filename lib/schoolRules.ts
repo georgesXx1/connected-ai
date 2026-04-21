@@ -388,8 +388,8 @@ function buildSearchTerms(question: string) {
   };
 }
 
-export function getSchoolRulesText() {
-  const publishedRules = getPublishedRules();
+export async function getSchoolRulesText() {
+  const publishedRules = await getPublishedRules();
   const dynamicRulesText = publishedRules
     .map((rule) => formatPublishedRuleForContext(rule))
     .join("\n\n");
@@ -513,8 +513,8 @@ function splitRuleTextForSearch(text: string) {
   return usefulChunks.length > 0 ? usefulChunks : [normalizedText];
 }
 
-function getSearchableRuleChunks(): SearchableRuleChunk[] {
-  const publishedRules = getPublishedRules();
+async function getSearchableRuleChunks(): Promise<SearchableRuleChunk[]> {
+  const publishedRules = await getPublishedRules();
   const updatedChunks = publishedRules
     .flatMap((rule) =>
       splitRuleTextForSearch(rule.arabicText).map((text) => ({
@@ -538,12 +538,13 @@ function getSearchableRuleChunks(): SearchableRuleChunk[] {
   return [...updatedChunks, ...rulebookChunks];
 }
 
-export function getSchoolRulesChunks() {
-  return getSearchableRuleChunks().map((chunk) => chunk.text);
+export async function getSchoolRulesChunks() {
+  const chunks = await getSearchableRuleChunks();
+  return chunks.map((chunk) => chunk.text);
 }
 
-export function findRelevantRuleChunks(question: string, limit = 3) {
-  const chunks = getSearchableRuleChunks();
+export async function findRelevantRuleChunks(question: string, limit = 3) {
+  const chunks = await getSearchableRuleChunks();
   const { questionTokens, matchedConcepts, conceptTerms } = buildSearchTerms(question);
 
   const scoredChunks = chunks.map((chunk) => {

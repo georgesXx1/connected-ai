@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const content = readAdminContent();
+  const content = await readAdminContent();
 
   return NextResponse.json(
     {

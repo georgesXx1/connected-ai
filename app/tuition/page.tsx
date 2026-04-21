@@ -65,7 +65,7 @@ export default async function TuitionPage({ searchParams }: TuitionPageProps) {
   const t = TRANSLATIONS[language];
   const textDirection = language === "ar" ? "rtl" : "ltr";
   const textAlignClass = language === "ar" ? "text-right" : "text-left";
-  const gradeInfo = getGradePublicInfo();
+  const gradeInfo = await getGradePublicInfo();
 
   return (
     <main

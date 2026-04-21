@@ -3,6 +3,8 @@ import Image from "next/image";
 
 import { getPublishedRules, type AdminRule } from "@/lib/admin-content";
 
+export const dynamic = "force-dynamic";
+
 type Language = "en" | "fr" | "ar";
 
 type RulesPageProps = {
@@ -91,7 +93,7 @@ export default async function RulesPage({ searchParams }: RulesPageProps) {
   const textDirection = language === "ar" ? "rtl" : "ltr";
   const textAlignClass = language === "ar" ? "text-right" : "text-left";
 
-  const publishedRules = getPublishedRules();
+  const publishedRules = await getPublishedRules();
   const categories = [...new Set(publishedRules.map((rule) => rule.category))].sort((a, b) =>
     a.localeCompare(b),
   );
