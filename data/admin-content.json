@@ -152,6 +152,24 @@
       "createdAt": "2026-04-20T20:07:29.503Z",
       "updatedAt": "2026-04-20T20:07:47.320Z",
       "status": "published"
+    },
+    {
+      "id": "rule-v67dbfi4",
+      "title": "منع مضغ العلكة",
+      "arabicText": "يُمنع على التلاميذ مضغ العلكة داخل الصفوف الدراسية.",
+      "category": "General",
+      "createdAt": "2026-04-21T16:59:34.499Z",
+      "updatedAt": "2026-04-21T16:59:42.407Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-oudzd106",
+      "title": "Mandatory Field Trip Participation",
+      "arabicText": "يُلزم جميع التلاميذ بالمشاركة في الرحلات الميدانية التعليمية التي تنظمها المدرسة، وذلك ضمن الأنشطة اللاصفية المقررة.",
+      "category": "General",
+      "createdAt": "2026-04-21T17:51:18.862Z",
+      "updatedAt": "2026-04-21T17:51:39.523Z",
+      "status": "trashed"
     }
   ],
   "publicInfo": {
@@ -231,7 +249,7 @@
       "id": "kg1",
       "className": "Kindergarten 1",
       "ageRange": "ages 3-4",
-      "tuitionAmount": "2100",
+      "tuitionAmount": "3000",
       "tuitionCurrency": "USD",
       "stationeryAmount": "90",
       "stationeryCurrency": "USD",
@@ -265,7 +283,7 @@
           "updatedAt": "2026-04-19T11:17:08.232Z"
         }
       ],
-      "updatedAt": "2026-04-19T11:22:49.798Z"
+      "updatedAt": "2026-04-21T17:01:50.243Z"
     },
     {
       "id": "kg2",
@@ -744,5 +762,5 @@
       "updatedAt": "2026-04-19T11:15:18.121Z"
     }
   ],
-  "updatedAt": "2026-04-21T13:22:00.326Z"
+  "updatedAt": "2026-04-21T17:51:39.524Z"
 }

@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { kv } from "@vercel/kv";
 
 import { getAdminSessionUser } from "@/lib/admin-auth";
-import { type AdminRule, readAdminContent, saveAdminRules } from "@/lib/admin-content";
+import { type AdminRule } from "@/lib/admin-content";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const ADMIN_RULES_KEY = "admin_rules";
 
 function revalidateRuleSurfaces() {
   revalidatePath("/rules", "page");
@@ -57,6 +60,16 @@ function jsonRules(rules: AdminRule[], status = 200) {
   return NextResponse.json({ rules }, { status });
 }
 
+async function getAdminRules() {
+  const rules = (await kv.get<AdminRule[]>(ADMIN_RULES_KEY)) || [];
+  return Array.isArray(rules) ? rules : [];
+}
+
+async function saveAdminRules(rules: AdminRule[]) {
+  await kv.set(ADMIN_RULES_KEY, rules);
+  return rules;
+}
+
 async function requireAdmin() {
   const username = await getAdminSessionUser();
   return username;
@@ -69,7 +82,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized.", rules: [] }, { status: 401 });
   }
 
-  return jsonRules(readAdminContent().rules);
+  const rules = await getAdminRules();
+  return jsonRules(rules);
 }
 
 export async function POST(request: Request) {
@@ -99,13 +113,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const content = readAdminContent();
+  const rules = await getAdminRules();
   const nextRule = normalizeRule(rule);
-  const nextRules = [...content.rules, nextRule];
-  const savedContent = saveAdminRules(nextRules);
+  const nextRules = [...rules, nextRule];
+  const savedRules = await saveAdminRules(nextRules);
 
   revalidateRuleSurfaces();
-  return jsonRules(savedContent.rules, 201);
+  return jsonRules(savedRules, 201);
 }
 
 export async function PUT(request: Request) {
@@ -135,12 +149,12 @@ export async function PUT(request: Request) {
     );
   }
 
-  const content = readAdminContent();
-  const existingRule = content.rules.find((entry) => entry.id === rule.id.trim());
+  const rules = await getAdminRules();
+  const existingRule = rules.find((entry) => entry.id === rule.id.trim());
 
   if (!existingRule) {
     return NextResponse.json(
-      { error: "Rule not found.", rules: content.rules },
+      { error: "Rule not found.", rules },
       { status: 404 },
     );
   }
@@ -150,13 +164,13 @@ export async function PUT(request: Request) {
     createdAt: existingRule.createdAt,
   });
 
-  const nextRules = content.rules.map((entry) =>
+  const nextRules = rules.map((entry) =>
     entry.id === nextRule.id ? nextRule : entry,
   );
-  const savedContent = saveAdminRules(nextRules);
+  const savedRules = await saveAdminRules(nextRules);
 
   revalidateRuleSurfaces();
-  return jsonRules(savedContent.rules);
+  return jsonRules(savedRules);
 }
 
 export async function DELETE(request: Request) {
@@ -190,19 +204,19 @@ export async function DELETE(request: Request) {
     );
   }
 
-  const content = readAdminContent();
-  const existingRule = content.rules.find((rule) => rule.id === id);
+  const rules = await getAdminRules();
+  const existingRule = rules.find((rule) => rule.id === id);
 
   if (!existingRule) {
     return NextResponse.json(
-      { error: "Rule not found.", rules: content.rules },
+      { error: "Rule not found.", rules },
       { status: 404 },
     );
   }
 
   const nextRules = permanent
-    ? content.rules.filter((rule) => rule.id !== id)
-    : content.rules.map((rule) =>
+    ? rules.filter((rule) => rule.id !== id)
+    : rules.map((rule) =>
         rule.id === id
           ? {
               ...rule,
@@ -212,7 +226,7 @@ export async function DELETE(request: Request) {
           : rule,
       );
 
-  const savedContent = saveAdminRules(nextRules);
+  const savedRules = await saveAdminRules(nextRules);
   revalidateRuleSurfaces();
-  return jsonRules(savedContent.rules);
+  return jsonRules(savedRules);
 }
