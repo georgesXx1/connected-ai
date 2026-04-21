@@ -1,0 +1,748 @@
+{
+  "rules": [
+    {
+      "id": "rule-001",
+      "title": "كلّ نظامٍ يوضع من أجل خدمة الإنسان وتنظيم حياة الجماعة بشكلٍ يتوافق ونموّ جميع أعضائها",
+      "arabicText": "كلّ نظامٍ يوضع من أجل خدمة الإنسان وتنظيم حياة الجماعة بشكلٍ يتوافق ونموّ جميع أعضائها. لذا تنظّم راهبات الورديّة الحياة الجماعيّة في مدارسهنّ، إنطلاقًا من رسالتهنّ وبالعمل مع الفريق التربويّ والإداريّ، بغية تأمين الإطار المناسب للعمل المثمر ولبناء شخصيّةٍ مستقلّةٍ لدى التلاميذ.\nهذه الغائيّة تتطلّب تحديد بعض القواعد التي تسمح لكل فردٍ معرفة حقوقه وواجباته.",
+      "category": "General",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T19:50:56.346Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-002",
+      "title": "الدّوام المدرسيّ",
+      "arabicText": "1- الدّوام المدرسيّ:\n- يبدأ الدّوام المدرسيّ في تمام السّاعة 7:35 صباحًا، وينتهي عند السّاعة 2:40 من بعد الظّهر.\n- على التّلاميذ احترام التّوقيت الصّباحي وذلك كي يتسنّى لهم المشاركة في الصّلاة الصّباحيّة.\n- عند نهاية الدّوام، يترك التّلاميذ المدرسة متّجهين إلى منازلهم من دون تأخّر.\n2- التغيّب والتأخّر:\n- يُعلم الأهلُ إدراةَ المدرسة بغياب أبنائهم مبرّرين السّبب.\n- أيّ غيابٍ يتعدّى الثّلاثة أيّام يجب أن يُبرَّر بتقريرٍ طبيٍّ.\n- التّلميذ الذي يتأخّر 3 مرّات عن الدّوام المدرسيّ يكون عرضةً للاقصاء عن الحصّة الأولى ولا يمكنه الالتحاق بصفّه إلّا بإذنٍ خطيّ من مسؤول القسم. واذا ما تكرر الموضوع ينال التلميذ بطاقة انذار.\n- من الضروريّ أن يشارك التّلميذ في النّشاطات والرّحلات التي تقوم بها الإدارة (روحية، تربوية، ثقافية أو غيرها).",
+      "category": "Attendance",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T17:10:23.511Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-003",
+      "title": "إذن بالمغادرة",
+      "arabicText": "3- إذن بالمغادرة:\n- لا يغادر التّلاميذ المدرسة أثناء الدّوام المدرسيّ.\n- إذن المغادرة الاستثنائيّة، يُطلب من قبل الأهل مشافهةً أو كتابةً. في هذه الحالة، على الأهل أن يأخذوا ولدهم من إدارة القسم وذلك حرصًا منّا على سلامة التّلاميذ.\n- يُرجى من الوالدين عدم أخذ موعد عند الطّبيب لولدهم خلال الدّوام المدرسيّ.",
+      "category": "Leaving School",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-004",
+      "title": "العمل الأكاديميّ",
+      "arabicText": "4- العمل الأكاديميّ:\n- في الصّفّ، واجب لكلّ تلميذِ التّعلّم والمشاركة في الدّرس مع طرح الأسئلة في حال عدم الفهم، وفي المقابل يجب أن يصغي وأن يكون حاضرًا بكليّته.\n- من أجل تحقيق التعلّم يجلس التّلميذ بشكلٍ يساعده على التّركيز، يرفع يده للمشاركة وينتظر دوره حتى يسمح له المدرّس بالكلام.\n- إدراكًا منهم لخيرهم، يعمل التّلاميذ بانتظامٍ، يتمّمونَ واجباتهم البيتيّة ويجلبون معهم كلّ اللّوازم التي تتطلّبها المواد.\n- التّلميذ مسؤولٌ عن الدّروس التي تغيّب عنها، لذلك إذا تغيّب عن أيّ حصّة عليه أن يكون على اطلاع بالدّروس والفروض التي تمّت أثناء غيابه.\n- يقف التّلميذ عندما يدخل شخصٌ راشدٌ إلى صفّه علامةً للاحترام.\n- يترك التّلاميذ مكانهم نظيفًا بعد انتهاء الدّوام المدرسيّ ويوضّبون أغراضهم قبل الذّهاب إلى البيت.\n- يطّلع الأهل على المسيرة المدرسيّة لأولادهم ويوقّعون المراسالات الوافدة إليهم من قبل المدرسة.\n- يُلبّي الأهل دعوة المدرسة لهم لحضور الاجتماعات مع الإدارة أو مع الفريق التّربويّ.",
+      "category": "Academic Work",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-005",
+      "title": "الاختبارات والترفّع إلى صفٍّ أعلى",
+      "arabicText": "5- الاختبارات والترفّع إلى صفٍّ أعلى:\n- يخضع التلاميذ أربع مرّاتٍ للتّقييم خلال السّنة الدّراسيّة: إختبارين وامتحانين (2 TQ et 2 examens).\n- لا يجوز التّغيّب عن الامتحان إلّا في حالاتٍ قصوى تُبرَّر بتقريرٍ طبيٍّ، واذا حصل ذلك، على التّلميذ أن يكون حاضرًا لإجرائه عند العودة الى المدرسة.\n- كلّ محاولة غشٍّ نتيجتها علامة صفر على المادّة المعنيّة.\n- للترفّع من صفٍّ إلى صفٍّ، يجب أن يحصل المتعلّم على معدلٍ يكون مساويًا أو أكثر من 10/20. كلّ تلميذٍ لا يحصّل معدّل 12/20 في المواد العلميّة، لا يمكنه أن يختار اختصاصًا علميًا في الصّفوف الثّانويّة.\n- لا تعطي الإدارة لأيّ تلميذِ فرصة القيام بامتحان استلحاقٍ، فالنتيجة تكون إما النّجاح أو الرّسوب، من هنا ضرورة العمل الحثيث والمذاكرة اليوميّة.",
+      "category": "Exams",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-006",
+      "title": "تطبيق الـ eSchool",
+      "arabicText": "6- تطبيق الـ eSchool:\n- تعتمد المدرسة تطبيق الـ eSchool في إرسال المفكّرة المدرسيّة والمراسلات للتّلاميذ والأهل.\n- يُطلب من الأهل تحميل هذا التّطبيق والتّأكد منه دوريًّا للتّمكّن من التّواصل مع إدارة المدرسة، رؤية العلامات واستقبال كلّ التّعاميم الإدرايّة.\n- بالنّسبة للتّواصل مع الإدارة يعمد الأهل إلى الاتّصال عبر هاتف المدرسة أو عبر البريد الالكتروني cs.jbeil@rosaire.edu.lb.",
+      "category": "eSchool",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-007",
+      "title": "الزيّ المدرسيّ",
+      "arabicText": "7- الزيّ المدرسيّ:\n- الزّيّ المدرسيّ إلزاميّ خلال الدّوام المدرسيّ وخلال الرّحلات.\n- يتكوّن الزّيّ المدرسيّ من:\n* حذاء أسود اللّون أو بنيّ أو كحليّ أو رماديّ أو أبيض.\n* في الشّتاء، بنطلون كحليّ، قميص، كنزة خمريّة اللون أو سترة كحليّة ومعطف.\n* في الصّيف، الفتيات يرتدين المريول مع القميص أمّا الفتيان فيرتدون البنطلون الكحلي الخاص بالمدرسة مع البولو.\n* اللّباس الرّياضيّ مخصّصٌ لليوم الذي فيه حصّة الرّياضة، ولا يُسمح بأيّ سروالٍ قصير (short) غير الخاصّ بالمدرسة.\n- يُرجى الإنتباه إلى عدم:\n* انتعال الصّندل في المدرسة.\n* ارتداء البنطلون الممزّق أو الضيّق (fuseau) أو الجينز.\n* أيّ نوع زينة (الماكياج، vernis، الحليّ – لا سيّما الذهب –، الجل، طوق العنق، الأقراط...).\n- يُرجى ربط الشّعر ورفعه عن الوجه دومًا.\n- يُرجى من الفتيان حلق اللّحية بانتظام، وترتيب شعرهم بشكل يليق بهم (شعر قصير).",
+      "category": "Uniform",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-008",
+      "title": "التنقّلات في المدرسة ووقت الفرصة",
+      "arabicText": "8- التنقّلات في المدرسة ووقت الفرصة:\n- يصعد التّلاميذ إلى صفوفهم بعد الفرص بهدوءٍ عند قرع الجرس الأوّل ويجدر بهم التّواجد في أماكنهم قبل سماع الجرس الثّاني إذ يُصار عندها إلى إغلاق أبواب الصّفوف.\n- يطلب التّلميذ الإذن من مدرّس أو مدرّسة الصّفّ ومن ثمّ الإذن من النّاظرة قبل الدّخول إلى الحمّام.\n- عند انتهاء كلّ حصّةٍ ينتظر التّلاميذ معلّم المادّة التّالية في الصّفّ بمسؤوليّةٍ وهدوءٍ.\n- خلال الفرصة، لا يترك أيّ تلميذٍ الملعب ويصعد إلى الصّفّ إلّا بإذنٍ من الناظر(ة).\n- لا يبقى التّلميذ في الصّف أثناء الفرصة.\n- يحافظ التّلاميذ على نظافة المدرسة أثناء الفرصة فلا يرمون الأوراق أو أيّ شيءٍ آخر على الأرض، محترمين بذلك الخير العام.",
+      "category": "Movement and Break",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-009",
+      "title": "السّلوك",
+      "arabicText": "9- السّلوك:\n- من حقّ كلّ تلميذٍ أن يعطي رأيه باحترامٍ وأن يُصغى إليه عند أيّ سوء تفاهمٍ أو خلافٍ.\n- يُطلب من التّلاميذ أن يتمتّعوا بلغةٍ ومواقف تعكس احترامهم لذواتهم وللآخرين.\n- يُطلب من التّلاميذ تجنّب أيّ اختراقٍ للقوانين، أيّ تنمّرٍ، قلّة احترامٍ أو عنف تجاه رفاقهم وكلّ تجاوزٍ يتطلّب إتخاذ الإجراءات اللّازمة وقد تصل لغاية إقصاء التلميذ من المدرسة في نهاية العام الدراسيّ.\n- في حال حصل أيّ إشكالٍ بين التّلاميذ، يوصى بالعودة إلى مسؤول القسم أو النّاظر(ة) اللّذين تعود إليهما صلاحيّة البتّ بالخلاف من أجل المحافظة على حقوق واحترام الجميع.\n- من مسؤوليّة التّلاميذ المحافظة على معدّات المدرسة وأيّ مخالفةٍ في هذا السياق تتطلّب تصحيح الضّرر أو دفع نفقة تصليحها.\n- من مسؤوليّة التّلاميذ المحافظة على نظافة الأماكن التي يتواجدون فيها.\n- يُطلب من التّلاميذ عدم الأكل والشرب في الصّفّ، ومضغ العلكة ممنوعٌ منعًا باتًا في حرم المدرسة.\n- من أجل سلامتهم، لا يُسمح للتّلاميذ أن يقودوا سياراتهم الخاصة للقدوم إلى المدرسة.\n- كلّ شخصٍ مسؤولٌ عن لوازمه الشّخصيّة والمدرسة غير مسؤولةٍ عن أيّة حالة سرقةٍ أو فقدانٍ أو تلفٍ داخل حرم المدرسة، كما نلفت إلى أهمية تحديد المصروف اليومي للطالب بما لا يتجاوز حاجته الفعلية للشراء من دكان المدرسة، حرصًا على مصلحته وتنظيم عاداته.\n- يمتنع التّلاميذ عن إحضار أشياء قيّمةٍ أو مبالغ ماليّةٍ إلى المدرسة.\n- يُمنع منعًا باتًّا إحضار الهاتف النقّال إلى المدرسة، أو أيّة ألعاب إلكترونيّة أو السّاعة الذكيّة إلاّ لأسبابٍ موجبةٍ بحيث يُعلم الأهل الإدارة بتلك الحاجة ويودعها التّلميذ لدى الإدارة التي بدورها تكون غير مسؤولةٍ عنها. وإذا وُجد هاتفٌ مع تلميذٍ، يُصادر من قبل الإدارة لأسبوعٍ واحدٍ وإذا تكرّر ذلك لا يُعاد قبل نهاية السّنة الدّراسيّة.\n- يُطلب من التّلاميذ عدم إدخال مواد أو أشياء خطرةٍ أو غير مشروعةٍ أو الاتّجار بها أو استعمالها مثل الأسلحة، السّكاكين، الأدوات القاطعة، المصابيح على أشعة الليزر، المفرقعات، ورق اللعب، الدخان على أنواعه. أيّ تلميذٍ يقوم ببيع أو استعمال أيّ موادٍ غير مشروعةٍ يُعتبر مذنبًا ويتحمّل عواقب عمله، كما يمنع الاتجار بأيّ غرضٍ آخرٍ.\n- يُعلم الأهل مسؤولة القسم في حال طرأ أيّ جديدٍ على حياة الولد قد يؤثّر على سلوكه المدرسيّ (مرض أحد الوالدين، سفر أحد الوالدين، إنفصال في الأسرة...).\n- إن المدرسة هي مكان مخصص لاكتساب المعرفة والثقافة دون الشعارات والمناقشات الحزبية على أنواعها، بناءً عليه يُطلب عدم تناول هذه المواضيع داخل حرم المدرسة.",
+      "category": "Behavior and Devices",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-010",
+      "title": "العناية الصّحيّة",
+      "arabicText": "10- العناية الصّحيّة:\n- التّقارير الطّبيّة التي تعفو التّلميذ من ممارسة الرياضة تُدرَس من قبل ممرّضة وطبيب المدرسة اللذين يقرّران مع مسؤولة القسم في هذا الخصوص.\n- لا يتوجّه التلاميذ عند الممرّضة أثناء الحصص الدّراسيّة إلّا في الحالات الضّروريّة وبعد طلب إذن النّاظر(ة).\n- في حالة المرض المُعدي، يُعلم الأهل مسؤولة القسم مباشرةً ويبقى التّلميذ في البيت، وعند العودة، يصطحب معه تقريرًا طبيًّا يؤكّد شفاءه من المرض المُعدي.\n- في حال المرض المفاجئ، يعلم الأهل مباشرةً مسؤولة القسم.\n- في الحوادث، تتّصل الممرّضة بأهل التّلميذ كي يرافقوه إلى المستشفى مصحوبين بورقة التّأمين من قبل المدرسة.\n- في حال المرض في المدرسة تتّصل الممرّضة بالأهل الذين يتوجّهون إلى المدرسة لاصطحاب ولدهم المريض.\n- يُطلب من التّلاميذ ترك أدويتهم عند الممرّضة، وعدم إعطاء أو أخذ الدّواء من بعضهم البعض.\n- يُطلب من التّلاميذ المحافظة على نظافتهم الشّخصيّة: نظافة الأظافر، الشعر، اللباس...\n- يُطلب من التّلاميذ ضرورة الالتزام بوقت ثابت للنوم والاستيقاظ، بما يتراوح بين 8 إلى 9 ساعات ليليًا، مع تجنّب استخدام الشاشات قبل النوم، لما لذلك من أثر مباشر على نشاط الطالب وقدرته على التركيز وأدائه داخل الصف.\n- يحضر كلّ تلميذٍ أغراضه الشخصيّة لاستخدامها في المراحيض من محارم، محارم معطّرة أو غيرها، ويُطلب عدم الاستعارة من الآخرين.",
+      "category": "Health",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-011",
+      "title": "التلاميذ ذوو الصعوبات التعلّميّة",
+      "arabicText": "11- التلاميذ ذوو الصعوبات التعلّميّة:\n- في حالة الصعوبات التعلّميّة:\n* تملأ المعلّمات سلّم الكشف (fiche de signalement) حول أداء التّلميذ الأكاديميّ أو السّلوكيّ.\n* تلتقي الأخصّائيّة بالتّلميذ في مكتبها بهدف التّأكّد من ملاحظات المعلّمات. إذا كانت الصّعوبات طفيفةً ينتهي الأمر ببعض التّوصيات للتّلميذ، لأهله وللمعلّمين. أمّا في حال شدّة الصّعوبات التي قد تعيق المسيرة التعلّميّة، فيُوجّه التّلميذ إلى أخصائيّة خارج المدرسة للمتابعة بالتّواصل مع فريق المدرسة.\n- تأخذ المدرسة توصيات الأخصائيّة بعين الإعتبار وتعمل جهدها لتطبيقها قدر المستطاع.\n- يتوجّب على الأهل توقيع استمارة الرّفض إذا رفضوا المتابعة مع الأخصائيّة خارج المدرسة وبذلك يتحّملون هم مسؤوليّة العواقب النّاجمة عن عدم المتابعة.\n- تُدرس ملفّات بعض التّلاميذ ذوي الصّعوبات التّعلّميّة من أجل طلب المساعدة في الامتحانات الرّسميّة.",
+      "category": "Learning Support",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-012",
+      "title": "نظام العقاب",
+      "arabicText": "12- نظام العقاب:\n- من المهمّ الإشارة إلى:\n* حقّ التّلميذ في التّعبير، تفسير سلوكه والدّفاع عن نفسه.\n* متابعة أمر التّلميذ مع الأخصائيّة النّفسيّة.\n* العقاب فرديّ لا جماعيّ ويهدف إلى مساعدة التّلميذ على تحمّل مسؤوليّة أعماله.\n* يُحاسَب التّلميذ على اختراق القوانين بحسب خطورة الموقف.\n- ترسل إدارة القسم رسالةً على تطبيق eschool إلى الأهل تعلمهم فيها بكلّ مخالفةٍ يقوم بها ولدهم.\n- بعد 3 مخالفاتٍ لبنود هذا النّظام ينال التلميذ بطاقة إنذارٍ تُرسَل إلى الأهل من أجل توقيعها.\n- بعد بطاقتيّ إنذار تستدعي إدارة القسم ذوي التّلميذ من أجل التّباحث معهم في وضعه السّلوكيّ والأكاديميّ.\n- أيّ مخالفةٍ للنظام تعقب البطاقتين تفرض إقصاء التّلميذ عن صفّه ليومٍ كاملٍ يقضيه داخل المدرسة للقيام بأعمالٍ أكاديميّةٍ تحدّدها له الإدارة.\n- أيّ مخالفة بعد ذلك تستوجب أن يغيّر التّلميذ مدرسته في نهاية العام الدراسيّ.\n- هناك بعض المخالفات الجسيمة التي تستوجب استدعاء الأهل مباشرةً: التصرّف اللاأخلاقيّ، مغادرة المدرسة من دون إذنٍ، إحضار أيٍّ من الممنوعات، العنف...",
+      "category": "Discipline",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-013",
+      "title": "العلاقة مع الأهل",
+      "arabicText": "13- العلاقة مع الأهل:\n- إنّ التعاون بين الأهل وجميع العاملين في المدرسة، من إداريّين ومعلّمين وموظّفين، يضمن جوًّا مؤاتيًا لنموّ التلاميذ وبنيان شخصيّتهم بنضوجٍ وكبر.\n- يسود الاحترام المتبادل العلاقة التي تجمع الأهل بالمدرسة، لذا يُمنع أيّ شخص من كادر المدرسة التحدّث بطريقةٍ غير لائقةٍ مع الأهل أو عنهم.\n- يُطلب من الأهل، في المقابل، اعتماد أسلوبٍ ينمّ عن الاحترام في تعاملهم مع كادر المدرسة، وكلّ تجاوزٍ لحدود اللّياقة والاحترام قد يقود إلى إقصاء ولدهم من المدرسة.\n- يُطلب من الأهل الالتزام بوقت المراجعات ضمن الدوام المدرسيّ، ومن خلال رقم المدرسة أو البريد الالكتروني الخاص بالقسم حصرًا.\n- الحشمة مطلوبة ضمن حصن المدرسة.",
+      "category": "Parents",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-014",
+      "title": "في الختام",
+      "arabicText": "في الختام، يهدف هذا النظام إلى تنبيه حسّ المسؤوليّة عند أولادنا، فتربية الإنسان هي مسؤوليّةٌ مشتركةٌ من أجل إعداد مجتمعٍ سليمٍ وخيّرٍ.\nويُعدّ تطبيق هذا النظام ساري المفعول طوال العام الدراسي فور إرساله عبر تطبيق الـ eSchool، وفقًا لما ورد في البند السادس من النظام.",
+      "category": "General",
+      "createdAt": "2026-04-18T16:34:14.225Z",
+      "updatedAt": "2026-04-18T16:34:14.225Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-zlult1oe",
+      "title": "منع المقالب والمزاح على المعلمين",
+      "arabicText": "يُمنع منعًا باتًا على جميع الطلاب ممارسة أي مقالب أو مزح على المعلمين، خاصة في مناسبات مثل \"كذبة أبريل\". يجب على الطلاب إظهار الاحترام الواجب للهيئة التدريسية والحفاظ على بيئة تعليمية جادة ومنظمة في جميع الأوقات. تُعتبر أي مخالفة لهذا التوجيه تصرفًا غير لائق وقد تتخذ الإدارة المدرسية الإجراءات التأديبية المناسبة حيالها.",
+      "category": "General",
+      "createdAt": "2026-04-19T08:56:36.483Z",
+      "updatedAt": "2026-04-19T08:56:52.907Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-teoj4csy",
+      "title": "إجراءات الوقاية الصحية",
+      "arabicText": "يُطلب من التلاميذ ارتداء الكمامات الواقية عند ظهور أي أعراض مرضية عليهم، وذلك حرصًا على سلامتهم وسلامة زملائهم والهيئة التعليمية والإدارية.",
+      "category": "General",
+      "createdAt": "2026-04-20T13:59:38.504Z",
+      "updatedAt": "2026-04-20T13:59:48.880Z",
+      "status": "published"
+    },
+    {
+      "id": "rule-8y1t87ar",
+      "title": "General",
+      "arabicText": "يُشترط لانتقال التلميذ إلى الصف الحادي عشر – البكالوريا العلمية أن يحصل على معدل عام لا يقل عن 10/20 ومعدل في المواد العلمية لا يقل عن 12/20 في الشهادة النهائية للصف العاشر. وإذا لم يستوفِ التلميذ هذين الشرطين، يُوجَّه إلى الصف الحادي عشر – بكالوريا اقتصادية.",
+      "category": "General",
+      "createdAt": "2026-04-20T20:07:29.503Z",
+      "updatedAt": "2026-04-20T20:07:47.320Z",
+      "status": "published"
+    }
+  ],
+  "publicInfo": {
+    "overview": {
+      "key": "overview",
+      "title": {
+        "en": "School Overview",
+        "fr": "Presentation de l'ecole",
+        "ar": "نظرة عامة على المدرسة"
+      },
+      "content": {
+        "en": "GEMAI supports Collège des Soeurs du Rosaire Blat-Jbeil with official school information, student guidance, and clear communication for families and visitors.",
+        "fr": "GEMAI accompagne le College des Soeurs du Rosaire Blat-Jbeil avec des informations officielles, un accompagnement scolaire et une communication claire pour les familles et les visiteurs.",
+        "ar": "تقدّم منصة GEMAI معلومات المدرسة الرسمية والإرشاد المدرسي والتواصل الواضح للعائلات والزوار في مدرسة راهبات الوردية بلاط - جبيل."
+      },
+      "updatedAt": "2026-04-18T16:34:14.229Z"
+    },
+    "contact": {
+      "key": "contact",
+      "title": {
+        "en": "Contact Information",
+        "fr": "Coordonnees",
+        "ar": "معلومات التواصل"
+      },
+      "content": {
+        "en": "Phone: +961 09 945 190\nEmail: rosairejbeilofficial@gmail.com\n\nThe school is located in Blat, Jbeil District, Mount Lebanon, Lebanon.",
+        "fr": "Telephone : +961 09 945 190\nE-mail : rosairejbeilofficial@gmail.com\n\nL'ecole est situee a Blat, dans le district de Jbeil, au Mont-Liban, au Liban.",
+        "ar": "الهاتف: +961 09 945 190\nالبريد الإلكتروني: rosairejbeilofficial@gmail.com\n\nتقع المدرسة في بلاط، قضاء جبيل، جبل لبنان، لبنان."
+      },
+      "updatedAt": "2026-04-18T16:34:14.229Z"
+    },
+    "officeHours": {
+      "key": "officeHours",
+      "title": {
+        "en": "Office Hours",
+        "fr": "Horaires administratifs",
+        "ar": "ساعات الدوام"
+      },
+      "content": {
+        "en": "The school day begins at 7:35 AM and ends at 2:40 PM. Visitors should confirm administrative office availability before coming.",
+        "fr": "La journee scolaire commence a 7h35 et se termine a 14h40. Les visiteurs devraient confirmer les horaires du bureau administratif avant de venir.",
+        "ar": "يبدأ الدوام المدرسي عند الساعة 7:35 صباحًا وينتهي عند الساعة 2:40 بعد الظهر. ويُفضّل على الزوار تأكيد أوقات دوام الإدارة قبل الحضور."
+      },
+      "updatedAt": "2026-04-18T16:34:14.229Z"
+    },
+    "tuition": {
+      "key": "tuition",
+      "title": {
+        "en": "Tuition",
+        "fr": "Frais de scolarite",
+        "ar": "الاقساط"
+      },
+      "content": {
+        "en": "Public financial details can be published here when the school wants families to review official fee guidance before contacting administration.",
+        "fr": "Les informations financieres publiques peuvent etre publiees ici si l'ecole souhaite permettre aux familles de consulter les indications officielles avant de contacter l'administration.",
+        "ar": "يمكن نشر المعلومات المالية العامة هنا عندما ترغب المدرسة في إتاحة مراجعة الرسوم أو التوضيحات الرسمية للعائلات قبل التواصل مع الإدارة."
+      },
+      "updatedAt": "2026-04-18T16:34:14.229Z"
+    },
+    "programs": {
+      "key": "programs",
+      "title": {
+        "en": "Programs",
+        "fr": "Programmes",
+        "ar": "البرامج"
+      },
+      "content": {
+        "en": "This section can describe grade levels, learning programs, extracurricular activities, and support services offered by the school.",
+        "fr": "Cette section peut presenter les niveaux scolaires, les programmes d'apprentissage, les activites complementaires et les services d'accompagnement proposes par l'ecole.",
+        "ar": "يمكن أن يشرح هذا القسم المراحل الدراسية، والبرامج التعليمية، والأنشطة، والخدمات الداعمة التي توفّرها المدرسة."
+      },
+      "updatedAt": "2026-04-18T16:34:14.229Z"
+    }
+  },
+  "gradeInfo": [
+    {
+      "id": "kg1",
+      "className": "Kindergarten 1",
+      "ageRange": "ages 3-4",
+      "tuitionAmount": "2100",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "90",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "kg1-book-1",
+          "name": "Kindergarten 1 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "kg1-book-2",
+          "name": "Kindergarten 1 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "kg1-book-3",
+          "name": "Kindergarten 1 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "book-1776597395990",
+          "name": "philosiphy",
+          "status": "trashed",
+          "createdAt": "2026-04-19T11:16:35.990Z",
+          "updatedAt": "2026-04-19T11:17:08.232Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:22:49.798Z"
+    },
+    {
+      "id": "kg2",
+      "className": "Kindergarten 2",
+      "ageRange": "ages 4-5",
+      "tuitionAmount": "1920",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "98",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "kg2-book-1",
+          "name": "Kindergarten 2 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "kg2-book-2",
+          "name": "Kindergarten 2 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "kg2-book-3",
+          "name": "Kindergarten 2 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "kg3",
+      "className": "Kindergarten 3",
+      "ageRange": "ages 5-6",
+      "tuitionAmount": "2040",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "106",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "kg3-book-1",
+          "name": "Kindergarten 3 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "kg3-book-2",
+          "name": "Kindergarten 3 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "kg3-book-3",
+          "name": "Kindergarten 3 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-1",
+      "className": "Grade 1",
+      "ageRange": "ages 6-7",
+      "tuitionAmount": "23000",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "114",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-1-book-1",
+          "name": "Grade 1 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-1-book-2",
+          "name": "Grade 1 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-1-book-3",
+          "name": "Grade 1 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T13:34:07.827Z"
+    },
+    {
+      "id": "grade-2",
+      "className": "Grade 2",
+      "ageRange": "ages 7-8",
+      "tuitionAmount": "2280",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "122",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-2-book-1",
+          "name": "Grade 2 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-2-book-2",
+          "name": "Grade 2 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-2-book-3",
+          "name": "Grade 2 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-3",
+      "className": "Grade 3",
+      "ageRange": "ages 8-9",
+      "tuitionAmount": "2400",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "130",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-3-book-1",
+          "name": "Grade 3 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-3-book-2",
+          "name": "Grade 3 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-3-book-3",
+          "name": "Grade 3 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-4",
+      "className": "Grade 4",
+      "ageRange": "ages 9-10",
+      "tuitionAmount": "10000",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "400",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-4-book-1",
+          "name": "Grade 4 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-4-book-2",
+          "name": "Grade 4 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-4-book-3",
+          "name": "Grade 4 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "book-1776694565669",
+          "name": "geography",
+          "status": "active",
+          "createdAt": "2026-04-20T14:16:05.669Z",
+          "updatedAt": "2026-04-20T14:16:05.669Z"
+        }
+      ],
+      "updatedAt": "2026-04-20T14:16:05.669Z"
+    },
+    {
+      "id": "grade-5",
+      "className": "Grade 5",
+      "ageRange": "ages 10-11",
+      "tuitionAmount": "2640",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "146",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-5-book-1",
+          "name": "Grade 5 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-5-book-2",
+          "name": "Grade 5 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-5-book-3",
+          "name": "Grade 5 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-6",
+      "className": "Grade 6",
+      "ageRange": "ages 11-12",
+      "tuitionAmount": "4000",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "154",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-6-book-1",
+          "name": "Grade 6 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-6-book-2",
+          "name": "Grade 6 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-6-book-3",
+          "name": "Grade 6 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "book-1776711903349",
+          "name": "history",
+          "status": "active",
+          "createdAt": "2026-04-20T19:05:03.349Z",
+          "updatedAt": "2026-04-20T19:05:03.349Z"
+        }
+      ],
+      "updatedAt": "2026-04-20T19:05:03.349Z"
+    },
+    {
+      "id": "grade-7",
+      "className": "Grade 7",
+      "ageRange": "ages 12-13",
+      "tuitionAmount": "2880",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "162",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-7-book-1",
+          "name": "Grade 7 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-7-book-2",
+          "name": "Grade 7 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-7-book-3",
+          "name": "Grade 7 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-8",
+      "className": "Grade 8",
+      "ageRange": "ages 13-14",
+      "tuitionAmount": "3000",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "170",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-8-book-1",
+          "name": "Grade 8 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-8-book-2",
+          "name": "Grade 8 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-8-book-3",
+          "name": "Grade 8 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-9",
+      "className": "Grade 9",
+      "ageRange": "ages 14-15",
+      "tuitionAmount": "3120",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "178",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-9-book-1",
+          "name": "Grade 9 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-9-book-2",
+          "name": "Grade 9 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-9-book-3",
+          "name": "Grade 9 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-10",
+      "className": "Grade 10",
+      "ageRange": "ages 15-16",
+      "tuitionAmount": "3240",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "186",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-10-book-1",
+          "name": "Grade 10 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-10-book-2",
+          "name": "Grade 10 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-10-book-3",
+          "name": "Grade 10 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-11",
+      "className": "Grade 11",
+      "ageRange": "ages 16-17",
+      "tuitionAmount": "3360",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "194",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-11-book-1",
+          "name": "Grade 11 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-11-book-2",
+          "name": "Grade 11 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-11-book-3",
+          "name": "Grade 11 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    },
+    {
+      "id": "grade-12",
+      "className": "Grade 12",
+      "ageRange": "ages 17-18",
+      "tuitionAmount": "3480",
+      "tuitionCurrency": "USD",
+      "stationeryAmount": "202",
+      "stationeryCurrency": "USD",
+      "books": [
+        {
+          "id": "grade-12-book-1",
+          "name": "Grade 12 Arabic Reader",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-12-book-2",
+          "name": "Grade 12 Mathematics Workbook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        },
+        {
+          "id": "grade-12-book-3",
+          "name": "Grade 12 Science Notebook",
+          "status": "active",
+          "createdAt": "2026-04-19T11:15:18.121Z",
+          "updatedAt": "2026-04-19T11:15:18.121Z"
+        }
+      ],
+      "updatedAt": "2026-04-19T11:15:18.121Z"
+    }
+  ],
+  "updatedAt": "2026-04-21T13:22:00.326Z"
+}
