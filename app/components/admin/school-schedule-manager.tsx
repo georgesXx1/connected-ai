@@ -903,13 +903,13 @@ export default function SchoolScheduleManager({
                 key={period.id}
                 className="rounded-[26px] border border-white/10 bg-black/20 p-5"
               >
-                <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.8fr_0.9fr_auto]">
+                <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.9fr)]">
                   <input
                     value={period.label}
                     onChange={(event) =>
                       updatePeriod(index, "label", event.target.value)
                     }
-                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
+                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
                   />
                   <input
                     type="time"
@@ -917,7 +917,7 @@ export default function SchoolScheduleManager({
                     onChange={(event) =>
                       updatePeriod(index, "startTime", event.target.value)
                     }
-                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
                   />
                   <input
                     type="time"
@@ -925,25 +925,27 @@ export default function SchoolScheduleManager({
                     onChange={(event) =>
                       updatePeriod(index, "endTime", event.target.value)
                     }
-                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
                   />
                   <select
                     value={period.type}
                     onChange={(event) =>
                       updatePeriod(index, "type", event.target.value)
                     }
-                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
                   >
                     <option value="class">Class</option>
                     <option value="recess">Recess</option>
                   </select>
-                  <button
-                    type="button"
-                    onClick={() => deletePeriod(index)}
-                    className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-400/15"
-                  >
-                    Delete
-                  </button>
+                  <div className="lg:col-span-2 xl:col-span-4">
+                    <button
+                      type="button"
+                      onClick={() => deletePeriod(index)}
+                      className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-400/15"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

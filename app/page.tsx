@@ -548,7 +548,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
                     href={{ pathname: card.href, query: { lang: language } }}
                     dir={textDirection}
                     className={`gem-card gem-fade-up flex min-h-[220px] flex-col rounded-3xl p-5 ${
-                      rowIndex === 3 ? "w-full sm:w-[calc(50%-0.5rem)]" : ""
+                      rowIndex === 3 ? "w-full sm:w-[calc(50%_-_0.5rem)]" : ""
                     }`}
                   >
                     <h2
