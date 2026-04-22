@@ -2,6 +2,11 @@ import fs from "fs";
 import path from "path";
 import { kv } from "@vercel/kv";
 
+import {
+  type SchoolScheduleData,
+  readSchoolScheduleData,
+} from "@/lib/school-schedule";
+
 export type AdminRuleStatus = "draft" | "published" | "trashed";
 
 export type AdminRule = {
@@ -64,8 +69,11 @@ export type AdminContent = {
   rules: AdminRule[];
   publicInfo: AdminPublicInfo;
   gradeInfo: GradePublicInfo[];
+  schoolSchedule: SchoolScheduleData;
   updatedAt: string;
 };
+
+type AdminPublicContent = Omit<AdminContent, "rules" | "schoolSchedule">;
 
 const LEGACY_RULES_PATH = path.join(process.cwd(), "data", "school_rules.txt");
 const ADMIN_RULES_KEY = "admin_rules";
@@ -313,7 +321,7 @@ function buildDefaultGradeInfo(): GradePublicInfo[] {
   }));
 }
 
-function buildDefaultPublicContent(): Omit<AdminContent, "rules"> {
+function buildDefaultPublicContent(): AdminPublicContent {
   return {
     publicInfo: buildDefaultPublicInfo(),
     gradeInfo: buildDefaultGradeInfo(),
@@ -621,11 +629,11 @@ async function readAdminRules() {
   }
 }
 
-async function readAdminPublicContent(): Promise<Omit<AdminContent, "rules">> {
+async function readAdminPublicContent(): Promise<AdminPublicContent> {
   const defaults = buildDefaultPublicContent();
 
   try {
-    const content = await kv.get<Partial<Omit<AdminContent, "rules">>>(PUBLIC_INFO_KEY);
+    const content = await kv.get<Partial<AdminPublicContent>>(PUBLIC_INFO_KEY);
 
     if (!content || typeof content !== "object") {
       return defaults;
@@ -645,15 +653,17 @@ async function readAdminPublicContent(): Promise<Omit<AdminContent, "rules">> {
 }
 
 export async function readAdminContent() {
-  const [rules, publicContent] = await Promise.all([
+  const [rules, publicContent, schoolSchedule] = await Promise.all([
     readAdminRules(),
     readAdminPublicContent(),
+    readSchoolScheduleData(),
   ]);
 
   return {
     rules,
     publicInfo: publicContent.publicInfo,
     gradeInfo: publicContent.gradeInfo,
+    schoolSchedule,
     updatedAt: publicContent.updatedAt,
   };
 }
@@ -671,7 +681,7 @@ export async function saveAdminPublicInfo(
 ) {
   const current = await readAdminContent();
 
-  const nextPublicContent: Omit<AdminContent, "rules"> = {
+  const nextPublicContent: AdminPublicContent = {
     publicInfo: sanitizePublicInfo(publicInfo),
     gradeInfo: sanitizeGradeInfo(gradeInfo ?? current.gradeInfo, current.gradeInfo),
     updatedAt: nowIso(),
@@ -682,6 +692,7 @@ export async function saveAdminPublicInfo(
   return {
     ...nextPublicContent,
     rules: current.rules,
+    schoolSchedule: current.schoolSchedule,
   };
 }
 

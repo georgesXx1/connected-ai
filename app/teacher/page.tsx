@@ -6,8 +6,14 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+import type {
+  PublicTeacherAccount,
+  ScheduleDay,
+  TeacherScheduleEntry,
+} from "@/lib/school-schedule";
+
 type Role = "user" | "assistant";
-type TeacherMode = "teacher_activity" | "teacher_grades";
+type TeacherMode = "teacher_activity" | "teacher_grades" | "teacher_schedule";
 type Language = "en" | "fr" | "ar";
 
 type Message = {
@@ -41,10 +47,23 @@ type TranslationSet = {
   closeSidebarOverlay: string;
   requestFailed: string;
   responseFailed: string;
-  modes: Record<TeacherMode, ModeConfig>;
+  modes: Record<Exclude<TeacherMode, "teacher_schedule">, ModeConfig> &
+    Partial<Record<"teacher_schedule", ModeConfig>>;
 };
 
 const STORAGE_KEY = "gemai-language";
+const TEACHER_MODES: TeacherMode[] = [
+  "teacher_activity",
+  "teacher_grades",
+  "teacher_schedule",
+];
+const DAY_LABELS: Record<ScheduleDay, string> = {
+  monday: "Monday",
+  tuesday: "Tuesday",
+  wednesday: "Wednesday",
+  thursday: "Thursday",
+  friday: "Friday",
+};
 
 const TRANSLATIONS: Record<Language, TranslationSet> = {
   en: {
@@ -97,6 +116,17 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         ],
         icon: "G",
       },
+      teacher_schedule: {
+        label: "My Schedule",
+        shortLabel: "Schedule",
+        eyebrow: "Teacher timetable",
+        title: "My weekly schedule",
+        description:
+          "Sign in with the teacher account created by Administration to view your assigned classes.",
+        placeholder: "",
+        suggestions: [],
+        icon: "S",
+      },
     },
   },
   fr: {
@@ -148,6 +178,17 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
           "Suggère une mise à l’échelle équitable pour ces notes.",
         ],
         icon: "N",
+      },
+      teacher_schedule: {
+        label: "My Schedule",
+        shortLabel: "Schedule",
+        eyebrow: "Emploi du temps enseignant",
+        title: "My weekly schedule",
+        description:
+          "Connectez-vous avec le compte cree par l'administration pour consulter vos cours.",
+        placeholder: "",
+        suggestions: [],
+        icon: "S",
       },
     },
   },
@@ -206,6 +247,14 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
 
 function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function getModeConfig(translation: TranslationSet, mode: TeacherMode): ModeConfig {
+  return (
+    translation.modes[mode] ??
+    TRANSLATIONS.en.modes[mode] ??
+    TRANSLATIONS.en.modes.teacher_activity
+  );
 }
 
 function isLanguage(value: string | null): value is Language {
@@ -289,7 +338,17 @@ function TeacherPageContent() {
   const [chats, setChats] = useState<Record<TeacherMode, Message[]>>({
     teacher_activity: [],
     teacher_grades: [],
+    teacher_schedule: [],
   });
+  const [teacherLoginForm, setTeacherLoginForm] = useState({
+    username: "",
+    password: "",
+  });
+  const [teacherLoginError, setTeacherLoginError] = useState("");
+  const [teacherAccount, setTeacherAccount] = useState<PublicTeacherAccount | null>(null);
+  const [teacherSchedule, setTeacherSchedule] = useState<TeacherScheduleEntry[]>([]);
+  const [isTeacherSessionLoading, setIsTeacherSessionLoading] = useState(true);
+  const [isTeacherSigningIn, setIsTeacherSigningIn] = useState(false);
 
   const endRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -303,7 +362,7 @@ function TeacherPageContent() {
   }, [language]);
 
   const translation = TRANSLATIONS[language];
-  const currentConfig = translation.modes[activeMode];
+  const currentConfig = getModeConfig(translation, activeMode);
   const activeMessages = chats[activeMode];
   const hasMessages = activeMessages.length > 0;
   const textDirection = language === "ar" ? "rtl" : "ltr";
@@ -330,6 +389,74 @@ function TeacherPageContent() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTeacherSession() {
+      try {
+        const response = await fetch("/api/teacher/me");
+        const payload = await response.json().catch(() => null);
+
+        if (!cancelled && response.ok && payload?.teacher) {
+          setTeacherAccount(payload.teacher);
+          setTeacherSchedule(Array.isArray(payload.schedule) ? payload.schedule : []);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsTeacherSessionLoading(false);
+        }
+      }
+    }
+
+    void loadTeacherSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleTeacherLogin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setTeacherLoginError("");
+    setIsTeacherSigningIn(true);
+
+    try {
+      const response = await fetch("/api/teacher/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(teacherLoginForm),
+      });
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok || !payload?.teacher) {
+        throw new Error("The username or password is incorrect.");
+      }
+
+      const scheduleResponse = await fetch("/api/teacher/me");
+      const schedulePayload = await scheduleResponse.json().catch(() => null);
+
+      setTeacherAccount(payload.teacher);
+      setTeacherSchedule(
+        Array.isArray(schedulePayload?.schedule) ? schedulePayload.schedule : [],
+      );
+      setTeacherLoginForm({ username: "", password: "" });
+    } catch (loginError) {
+      setTeacherLoginError(
+        loginError instanceof Error
+          ? loginError.message
+          : "The username or password is incorrect.",
+      );
+    } finally {
+      setIsTeacherSigningIn(false);
+    }
+  }
+
+  async function handleTeacherLogout() {
+    await fetch("/api/teacher/logout", { method: "POST" });
+    setTeacherAccount(null);
+    setTeacherSchedule([]);
+  }
 
   function streamAssistantReply(mode: TeacherMode, fullText: string) {
     if (streamTimerRef.current) {
@@ -386,6 +513,10 @@ function TeacherPageContent() {
   }
 
   async function sendMessage(rawText: string) {
+    if (activeMode === "teacher_schedule") {
+      return;
+    }
+
     const trimmed = rawText.trim();
 
     if (!trimmed || isLoading) {
@@ -521,8 +652,8 @@ function TeacherPageContent() {
 
             <div className="flex min-h-0 flex-1 flex-col px-3 py-4">
               <nav className="space-y-2">
-                {(Object.keys(translation.modes) as TeacherMode[]).map((mode) => {
-                  const config = translation.modes[mode];
+                {TEACHER_MODES.map((mode) => {
+                  const config = getModeConfig(translation, mode);
                   const isActive = mode === activeMode;
 
                   return (
@@ -624,7 +755,150 @@ function TeacherPageContent() {
 
             <section className="min-h-0 flex-1 overflow-y-auto">
               <div className="mx-auto flex w-full max-w-5xl flex-col px-5 py-6 sm:px-7 sm:py-8">
-                {!hasMessages && (
+                {activeMode === "teacher_schedule" ? (
+                  <div className={`${textAlignClass}`} dir={textDirection}>
+                    {isTeacherSessionLoading ? (
+                      <div className="gem-panel rounded-[30px] p-7 text-sm text-slate-500">
+                        Loading teacher schedule...
+                      </div>
+                    ) : teacherAccount ? (
+                      <div className="space-y-6">
+                        <div className="gem-panel rounded-[30px] p-7">
+                          <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                              <p className="gem-eyebrow">Teacher account</p>
+                              <h3 className="mt-3 text-2xl font-black text-slate-950">
+                                {teacherAccount.fullName}
+                              </h3>
+                              <p className="mt-2 text-sm font-medium text-slate-500">
+                                @{teacherAccount.username}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleTeacherLogout}
+                              className="gem-soft-button inline-flex h-10 items-center justify-center rounded-2xl px-4 text-sm font-semibold"
+                            >
+                              Log out
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="gem-panel overflow-hidden rounded-[30px]">
+                          <div className="border-b border-blue-900/10 px-6 py-5">
+                            <p className="gem-eyebrow">My Schedule</p>
+                          </div>
+                          {teacherSchedule.length === 0 ? (
+                            <div className="p-6 text-sm leading-7 text-slate-500">
+                              No schedule entries have been assigned to this teacher yet.
+                            </div>
+                          ) : (
+                            <div className="overflow-x-auto">
+                              <table className="min-w-[760px] w-full border-collapse text-left">
+                                <thead>
+                                  <tr className="border-b border-blue-900/10 bg-white/50">
+                                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
+                                      Day
+                                    </th>
+                                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
+                                      Period
+                                    </th>
+                                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
+                                      Class
+                                    </th>
+                                    <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
+                                      Subject
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {teacherSchedule.map((entry) => (
+                                    <tr
+                                      key={entry.id}
+                                      className="border-b border-blue-900/10 last:border-b-0"
+                                    >
+                                      <td className="px-5 py-4 text-sm font-semibold text-slate-950">
+                                        {DAY_LABELS[entry.dayOfWeek]}
+                                      </td>
+                                      <td className="px-5 py-4 text-sm text-slate-600">
+                                        <span className="font-semibold text-slate-800">
+                                          {entry.periodLabel}
+                                        </span>
+                                        {entry.startTime && entry.endTime ? (
+                                          <span className="mt-1 block text-xs text-slate-500">
+                                            {entry.startTime} - {entry.endTime}
+                                          </span>
+                                        ) : null}
+                                      </td>
+                                      <td className="px-5 py-4 text-sm font-semibold text-slate-950">
+                                        {entry.className}
+                                      </td>
+                                      <td className="px-5 py-4 text-sm text-slate-600">
+                                        {entry.subject}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <form
+                        onSubmit={handleTeacherLogin}
+                        className="gem-panel mx-auto max-w-xl rounded-[30px] p-7"
+                      >
+                        <p className="gem-eyebrow">Teacher sign in</p>
+                        <h3 className="mt-3 text-2xl font-black text-slate-950">
+                          Open your schedule
+                        </h3>
+                        <p className="mt-3 text-sm leading-7 text-slate-500">
+                          Use the username and password created by Administration.
+                        </p>
+                        <div className="mt-6 space-y-4">
+                          <input
+                            value={teacherLoginForm.username}
+                            onChange={(event) =>
+                              setTeacherLoginForm((current) => ({
+                                ...current,
+                                username: event.target.value,
+                              }))
+                            }
+                            placeholder="Username"
+                            className="gem-input h-12 w-full rounded-2xl px-4 text-sm outline-none"
+                          />
+                          <input
+                            type="password"
+                            value={teacherLoginForm.password}
+                            onChange={(event) =>
+                              setTeacherLoginForm((current) => ({
+                                ...current,
+                                password: event.target.value,
+                              }))
+                            }
+                            placeholder="Password"
+                            className="gem-input h-12 w-full rounded-2xl px-4 text-sm outline-none"
+                          />
+                          {teacherLoginError ? (
+                            <div className="rounded-2xl border border-rose-500/20 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                              {teacherLoginError}
+                            </div>
+                          ) : null}
+                          <button
+                            type="submit"
+                            disabled={isTeacherSigningIn}
+                            className="gem-button inline-flex h-12 w-full items-center justify-center rounded-2xl text-sm font-bold disabled:opacity-60"
+                          >
+                            {isTeacherSigningIn ? "Signing in..." : "Sign in"}
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                ) : null}
+
+                {activeMode !== "teacher_schedule" && !hasMessages && (
                   <div className={`max-w-3xl ${textAlignClass}`} dir={textDirection}>
                     <div className="flex flex-wrap gap-2">
                       {currentConfig.suggestions.map((suggestion) => (
@@ -643,6 +917,7 @@ function TeacherPageContent() {
                   </div>
                 )}
 
+                {activeMode !== "teacher_schedule" ? (
                 <div className={`${hasMessages ? "mt-0" : "mt-8"} flex flex-col gap-7`}>
                   {activeMessages.map((message) => {
                     const isUser = message.role === "user";
@@ -715,11 +990,13 @@ function TeacherPageContent() {
                     </div>
                   )}
                 </div>
+                ) : null}
 
                 <div ref={endRef} />
               </div>
             </section>
 
+            {activeMode !== "teacher_schedule" ? (
             <div className="relative z-10 shrink-0 border-t border-blue-900/10 bg-white/55 px-5 py-4 backdrop-blur-xl sm:px-7 sm:py-5">
               <div className="mx-auto w-full max-w-5xl">
                 <div className="gem-input rounded-[28px] p-2.5 shadow-[0_22px_70px_-40px_rgba(11,47,134,0.75)]">
@@ -751,6 +1028,7 @@ function TeacherPageContent() {
                 </div>
               </div>
             </div>
+            ) : null}
           </main>
         </div>
       </div>

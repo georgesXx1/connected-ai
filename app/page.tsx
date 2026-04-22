@@ -31,6 +31,7 @@ const ROLE_ORDER = [
   "/rules",
   "/guest",
   "/tuition",
+  "/schedule",
   "/administration",
 ] as const;
 
@@ -81,6 +82,12 @@ const translations = {
         description:
           "Review grade-based tuition, stationery fees, and required books.",
         href: "/tuition",
+      },
+      {
+        title: "School Schedule",
+        description:
+          "View weekly class timetables with period times, subjects, teachers, and recess.",
+        href: "/schedule",
       },
     ],
     open: "Open",
@@ -142,6 +149,12 @@ const translations = {
           "Consultez les frais par classe, la قرطاسيّة et les livres requis.",
         href: "/tuition",
       },
+      {
+        title: "School Schedule",
+        description:
+          "Consultez les emplois du temps par classe avec horaires, matieres, enseignants et recreations.",
+        href: "/schedule",
+      },
     ],
     open: "Ouvrir",
     contactEyebrow: "Coordonnées",
@@ -198,6 +211,12 @@ const translations = {
         description:
           "اطّلع على الأقساط بحسب الصف، والقرطاسيّة، والكتب المطلوبة.",
         href: "/tuition",
+      },
+      {
+        title: "School Schedule",
+        description:
+          "View class timetables with period times, subjects, teachers, and recess.",
+        href: "/schedule",
       },
     ],
     open: "فتح",
@@ -357,6 +376,12 @@ export default function HomePage({ searchParams }: HomePageProps) {
         ),
     [t.roles, tuitionSummary],
   );
+  const roleCardRows = [
+    roleCards.slice(0, 2),
+    roleCards.slice(2, 4),
+    roleCards.slice(4, 6),
+    roleCards.slice(6, 7),
+  ];
 
   return (
     <main className="gem-page text-slate-950" dir={textDirection}>
@@ -507,13 +532,24 @@ export default function HomePage({ searchParams }: HomePageProps) {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {roleCards.map((card) => (
+              <div className="space-y-4">
+                {roleCardRows.map((row, rowIndex) => (
+                  <div
+                    key={row.map((card) => card.href).join("-")}
+                    className={
+                      row.length === 1
+                        ? "flex justify-center"
+                        : "grid gap-4 sm:grid-cols-2"
+                    }
+                  >
+                    {row.map((card) => (
                   <Link
                     key={card.title}
                     href={{ pathname: card.href, query: { lang: language } }}
                     dir={textDirection}
-                    className="gem-card gem-fade-up flex min-h-[220px] flex-col rounded-3xl p-5"
+                    className={`gem-card gem-fade-up flex min-h-[220px] flex-col rounded-3xl p-5 ${
+                      rowIndex === 3 ? "w-full sm:w-[calc(50%-0.5rem)]" : ""
+                    }`}
                   >
                     <h2
                       className={`text-2xl font-black tracking-tight text-slate-950 ${textAlignClass}`}
@@ -533,6 +569,8 @@ export default function HomePage({ searchParams }: HomePageProps) {
                       {t.open} {language === "ar" ? "←" : "→"}
                     </div>
                   </Link>
+                    ))}
+                  </div>
                 ))}
               </div>
 

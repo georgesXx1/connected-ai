@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
+import SchoolScheduleManager from "@/app/components/admin/school-schedule-manager";
 import type {
   AdminContent,
   AdminPublicInfo,
@@ -14,9 +15,10 @@ import type {
   GradePublicInfo,
   MoneyCurrency,
 } from "@/lib/admin-content";
+import type { SchoolScheduleData } from "@/lib/school-schedule";
 
 type Language = "en" | "fr" | "ar";
-type AdminSection = "dashboard" | "rules" | "public" | "settings";
+type AdminSection = "dashboard" | "rules" | "public" | "schedule" | "settings";
 type RuleManagerMode = "add" | "edit" | "trash";
 type ChatMessage = {
   id: string;
@@ -51,7 +53,7 @@ type TranslationSet = {
   signIn: string;
   signingIn: string;
   loginError: string;
-  sections: Record<AdminSection, string>;
+  sections: Partial<Record<AdminSection, string>>;
   dashboard: {
     title: string;
     totalRules: string;
@@ -150,13 +152,18 @@ type TranslationSet = {
     loggingOut: string;
     future: string;
   };
+  schedule: {
+    title: string;
+    description: string;
+  };
 };
 
 const SIDEBAR_ICONS: Record<AdminSection, string> = {
   dashboard: "D",
   rules: "R",
   public: "P",
-  settings: "S",
+  schedule: "S",
+  settings: "A",
 };
 
 const CATEGORY_SUGGESTIONS = [
@@ -187,6 +194,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       dashboard: "Dashboard",
       rules: "Rules Manager",
       public: "Public Information",
+      schedule: "School Schedule",
       settings: "Settings / Access",
     },
     dashboard: {
@@ -302,6 +310,11 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       future:
         "This area is ready for future access roles, password rotation, and audit controls.",
     },
+    schedule: {
+      title: "School Schedule",
+      description:
+        "Create class sections, manage teacher accounts, and build conflict-safe weekly timetables.",
+    },
   },
   fr: {
     portalSubtitle: "Controle officiel du contenu GEMAI",
@@ -319,6 +332,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       dashboard: "Tableau de bord",
       rules: "Gestion des regles",
       public: "Informations publiques",
+      schedule: "School Schedule",
       settings: "Parametres / Acces",
     },
     dashboard: {
@@ -433,6 +447,11 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       loggingOut: "Deconnexion...",
       future:
         "Cette zone est prete pour des roles d'acces, la rotation des mots de passe et un journal d'audit.",
+    },
+    schedule: {
+      title: "School Schedule",
+      description:
+        "Creez les sections, les comptes enseignants et les emplois du temps hebdomadaires sans conflit.",
     },
   },
   ar: {
@@ -561,6 +580,11 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       future:
         "هذه المساحة جاهزة لأدوار وصول مستقبلية وتدوير كلمات المرور وسجل تدقيق.",
     },
+    schedule: {
+      title: "School Schedule",
+      description:
+        "Create class sections, teacher accounts, and weekly timetables with conflict protection.",
+    },
   },
 };
 
@@ -574,6 +598,24 @@ function clonePublicInfo(publicInfo: AdminPublicInfo) {
 
 function cloneGradeInfo(gradeInfo: GradePublicInfo[]) {
   return structuredClone(gradeInfo);
+}
+
+function createFallbackSchoolSchedule(): SchoolScheduleData {
+  return {
+    classes: [],
+    teachers: [],
+    periods: Array.from({ length: 8 }, (_value, index) => ({
+      id: `period-${index + 1}`,
+      label: `Period ${index + 1}`,
+      startTime: "",
+      endTime: "",
+      type: "class",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })),
+    entries: [],
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 function createFallbackPublicInfo(): AdminPublicInfo {
@@ -750,10 +792,14 @@ export default function AdminPortal({
   const isArabic = language === "ar";
   const textDirection = isArabic ? "rtl" : "ltr";
   const textAlignClass = isArabic ? "text-right" : "text-left";
+  const sectionLabel = (section: AdminSection) =>
+    t.sections[section] || (section === "schedule" ? t.schedule.title : section);
 
   const initialRules = initialContent?.rules ?? [];
   const initialPublicInfo = initialContent?.publicInfo ?? createFallbackPublicInfo();
   const initialGradeInfo = initialContent?.gradeInfo ?? createFallbackGradeInfo();
+  const initialSchoolSchedule =
+    initialContent?.schoolSchedule ?? createFallbackSchoolSchedule();
 
   const [activeSection, setActiveSection] = useState<AdminSection>("dashboard");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -1571,13 +1617,13 @@ export default function AdminPortal({
         </div>
 
         <nav className="mt-8 flex flex-1 flex-col gap-3">
-          {(["dashboard", "rules", "public", "settings"] as AdminSection[]).map(
+          {(["dashboard", "rules", "public", "schedule", "settings"] as AdminSection[]).map(
             (section) => (
               <button
                 key={section}
                 type="button"
                 onClick={() => switchAdminSection(section)}
-                title={isSidebarCollapsed ? t.sections[section] : undefined}
+                title={isSidebarCollapsed ? sectionLabel(section) : undefined}
                 className={`flex h-14 w-full items-center overflow-hidden rounded-[22px] border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   isSidebarCollapsed
                     ? "justify-center gap-0 px-0"
@@ -1603,7 +1649,7 @@ export default function AdminPortal({
                       activeSection === section ? "text-blue-950" : "text-slate-700"
                     }`}
                   >
-                    {t.sections[section]}
+                    {sectionLabel(section)}
                   </span>
                 ) : null}
               </button>
@@ -1625,7 +1671,7 @@ export default function AdminPortal({
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className={textAlignClass}>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-                    {t.sections[activeSection]}
+                    {sectionLabel(activeSection)}
                   </p>
                   <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                     {activeSection === "dashboard"
@@ -1634,7 +1680,9 @@ export default function AdminPortal({
                         ? t.rules.title
                         : activeSection === "public"
                           ? t.publicInfo.title
-                          : t.settings.title}
+                          : activeSection === "schedule"
+                            ? t.schedule.title
+                            : t.settings.title}
                   </h1>
                   <p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-300">
                     {activeSection === "dashboard"
@@ -1643,7 +1691,9 @@ export default function AdminPortal({
                         ? t.rules.addDescription
                         : activeSection === "public"
                           ? t.publicInfo.description
-                          : t.settings.description}
+                          : activeSection === "schedule"
+                            ? t.schedule.description
+                            : t.settings.description}
                   </p>
                 </div>
 
@@ -2339,6 +2389,10 @@ export default function AdminPortal({
                     ) : null}
                   </div>
                 </div>
+              ) : null}
+
+              {activeSection === "schedule" ? (
+                <SchoolScheduleManager initialSchedule={initialSchoolSchedule} />
               ) : null}
 
               {activeSection === "settings" ? (
