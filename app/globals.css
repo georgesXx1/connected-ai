@@ -266,9 +266,12 @@ a {
 }
 
 .schedule-admin-split--classes,
-.schedule-admin-split--teachers,
-.schedule-admin-split--periods {
+.schedule-admin-split--teachers {
   grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+}
+
+.schedule-admin-split--periods {
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
 }
 
 .schedule-admin-split--timetables {

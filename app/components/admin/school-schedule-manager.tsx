@@ -1474,11 +1474,11 @@ export default function SchoolScheduleManager({
 
       {activeTab === "periods" ? (
         <div className="schedule-admin-split schedule-admin-split--periods">
-          <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
+          <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
               New period
             </p>
-            <div className="mt-6 space-y-4">
+            <div className="mt-5 space-y-3.5">
               <input
                 value={periodForm.label}
                 onChange={(event) =>
@@ -1488,7 +1488,7 @@ export default function SchoolScheduleManager({
                   }))
                 }
                 placeholder="Period 1, Recess 1..."
-                className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none placeholder:text-zinc-500"
+                className="h-11 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none placeholder:text-zinc-500"
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 <PeriodTimeInput
@@ -1502,7 +1502,7 @@ export default function SchoolScheduleManager({
                   onInvalid={() =>
                     setError("Invalid start time. Use 12-hour format like 07:45 AM.")
                   }
-                  className="h-12 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
+                  className="h-11 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
                 />
                 <PeriodTimeInput
                   value={periodForm.endTime}
@@ -1515,7 +1515,7 @@ export default function SchoolScheduleManager({
                   onInvalid={() =>
                     setError("Invalid end time. Use 12-hour format like 08:35 AM.")
                   }
-                  className="h-12 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
+                  className="h-11 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
                 />
               </div>
               <select
@@ -1526,7 +1526,7 @@ export default function SchoolScheduleManager({
                     type: event.target.value as "class" | "recess",
                   }))
                 }
-                className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
+                className="h-11 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
               >
                 <option value="class">Class period</option>
                 <option value="recess">Recess</option>
