@@ -1099,8 +1099,8 @@ export default function SchoolScheduleManager({
 
       {activeTab === "teachers" ? (
         <div className="space-y-6">
-          <div className="grid gap-6 xl:grid-cols-[minmax(320px,360px)_minmax(0,1fr)]">
-            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
+          <div className="grid gap-6 2xl:grid-cols-[minmax(320px,360px)_minmax(0,1fr)]">
+            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
               Add a teacher
             </p>
@@ -1188,7 +1188,7 @@ export default function SchoolScheduleManager({
             </div>
           </div>
 
-            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
+            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
@@ -1355,7 +1355,7 @@ export default function SchoolScheduleManager({
             </div>
           </div>
 
-          <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
+          <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
               Teacher profile
             </p>
