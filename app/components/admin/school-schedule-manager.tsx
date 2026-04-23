@@ -34,6 +34,7 @@ const SCHEDULE_DAYS: ScheduleDay[] = [
   "friday",
 ];
 const DEFAULT_PERIODS = 8;
+type Meridiem = "AM" | "PM";
 
 function createClientId(prefix: string) {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -63,6 +64,84 @@ function publicTeacherName(teacher: PublicTeacherAccount | TeacherDraft | undefi
   return teacher?.fullName || "No teacher";
 }
 
+function splitTimeParts(value: string): { timeText: string; meridiem: Meridiem } {
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$/i);
+
+  if (!match) {
+    return {
+      timeText: trimmed.replace(/\s*(AM|PM)$/i, ""),
+      meridiem: /PM$/i.test(trimmed) ? "PM" : "AM",
+    };
+  }
+
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const explicitMeridiem = match[3]?.toUpperCase() as Meridiem | undefined;
+
+  if (explicitMeridiem) {
+    return {
+      timeText: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+      meridiem: explicitMeridiem,
+    };
+  }
+
+  if (hour === 0) {
+    return { timeText: `12:${String(minute).padStart(2, "0")}`, meridiem: "AM" };
+  }
+
+  if (hour === 12) {
+    return { timeText: `12:${String(minute).padStart(2, "0")}`, meridiem: "PM" };
+  }
+
+  if (hour > 12 && hour <= 23) {
+    return {
+      timeText: `${String(hour - 12).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+      meridiem: "PM",
+    };
+  }
+
+  return {
+    timeText: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+    meridiem: "AM",
+  };
+}
+
+function normalizeTime12(value: string) {
+  const { timeText, meridiem } = splitTimeParts(value);
+
+  if (!timeText.trim()) {
+    return "";
+  }
+
+  const match = timeText.trim().match(/^(\d{1,2}):(\d{2})$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+
+  if (hour < 1 || hour > 12 || minute < 0 || minute > 59) {
+    return null;
+  }
+
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")} ${meridiem}`;
+}
+
+function getInvalidTimeMessage(periods: Array<Pick<SchedulePeriod, "label" | "startTime" | "endTime">>) {
+  const invalidPeriod = periods.find(
+    (period) =>
+      normalizeTime12(period.startTime) === null ||
+      normalizeTime12(period.endTime) === null,
+  );
+
+  return invalidPeriod
+    ? `${invalidPeriod.label || "This period"} has an invalid time. Use 12-hour format like 07:45 AM.`
+    : "";
+}
+
 function findClientConflict(entries: ScheduleEntry[]) {
   const seen = new Map<string, ScheduleEntry>();
 
@@ -82,6 +161,57 @@ function findClientConflict(entries: ScheduleEntry[]) {
   }
 
   return null;
+}
+
+function PeriodTimeInput({
+  value,
+  onChange,
+  onInvalid,
+  className,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onInvalid: () => void;
+  className: string;
+}) {
+  const { timeText, meridiem } = splitTimeParts(value);
+
+  function updateTime(nextTimeText: string, nextMeridiem = meridiem) {
+    onChange(nextTimeText.trim() ? `${nextTimeText} ${nextMeridiem}` : "");
+  }
+
+  function normalizeOnBlur() {
+    const normalized = normalizeTime12(`${timeText} ${meridiem}`);
+
+    if (normalized === null) {
+      onInvalid();
+      return;
+    }
+
+    onChange(normalized);
+  }
+
+  return (
+    <div className="flex min-w-0 gap-2">
+      <input
+        type="text"
+        inputMode="numeric"
+        value={timeText}
+        onChange={(event) => updateTime(event.target.value)}
+        onBlur={normalizeOnBlur}
+        placeholder="07:45"
+        className={`${className} min-w-0 flex-1`}
+      />
+      <select
+        value={meridiem}
+        onChange={(event) => updateTime(timeText, event.target.value as Meridiem)}
+        className="h-11 w-20 shrink-0 rounded-2xl border border-white/10 bg-[#0f1319] px-3 text-sm text-white outline-none"
+      >
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </select>
+    </div>
+  );
 }
 
 export default function SchoolScheduleManager({
@@ -301,12 +431,20 @@ export default function SchoolScheduleManager({
 
   function addPeriod() {
     clearMessages();
+    const normalizedStartTime = normalizeTime12(periodForm.startTime);
+    const normalizedEndTime = normalizeTime12(periodForm.endTime);
+
+    if (normalizedStartTime === null || normalizedEndTime === null) {
+      setError("Invalid time. Use 12-hour format like 07:45 AM.");
+      return;
+    }
+
     const timestamp = nowIso();
     const nextPeriod: SchedulePeriod = {
       id: createClientId("period"),
       label: periodForm.label.trim() || `Period ${periods.length + 1}`,
-      startTime: periodForm.startTime,
-      endTime: periodForm.endTime,
+      startTime: normalizedStartTime,
+      endTime: normalizedEndTime,
       type: periodForm.type,
       createdAt: timestamp,
       updatedAt: timestamp,
@@ -448,6 +586,13 @@ export default function SchoolScheduleManager({
 
   async function saveSchedule() {
     clearMessages();
+    const timeError = getInvalidTimeMessage(periods);
+
+    if (timeError) {
+      setError(timeError);
+      return;
+    }
+
     const conflict = findClientConflict(entries);
 
     if (conflict) {
@@ -851,25 +996,29 @@ export default function SchoolScheduleManager({
                 className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none placeholder:text-zinc-500"
               />
               <div className="grid gap-3 sm:grid-cols-2">
-                <input
-                  type="time"
+                <PeriodTimeInput
                   value={periodForm.startTime}
-                  onChange={(event) =>
+                  onChange={(value) =>
                     setPeriodForm((current) => ({
                       ...current,
-                      startTime: event.target.value,
+                      startTime: value,
                     }))
+                  }
+                  onInvalid={() =>
+                    setError("Invalid start time. Use 12-hour format like 07:45 AM.")
                   }
                   className="h-12 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
                 />
-                <input
-                  type="time"
+                <PeriodTimeInput
                   value={periodForm.endTime}
-                  onChange={(event) =>
+                  onChange={(value) =>
                     setPeriodForm((current) => ({
                       ...current,
-                      endTime: event.target.value,
+                      endTime: value,
                     }))
+                  }
+                  onInvalid={() =>
+                    setError("Invalid end time. Use 12-hour format like 08:35 AM.")
                   }
                   className="h-12 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none"
                 />
@@ -911,19 +1060,23 @@ export default function SchoolScheduleManager({
                     }
                     className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
                   />
-                  <input
-                    type="time"
+                  <PeriodTimeInput
                     value={period.startTime}
-                    onChange={(event) =>
-                      updatePeriod(index, "startTime", event.target.value)
+                    onChange={(value) =>
+                      updatePeriod(index, "startTime", value)
+                    }
+                    onInvalid={() =>
+                      setError(`${period.label || "This period"} has an invalid start time. Use 12-hour format like 07:45 AM.`)
                     }
                     className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
                   />
-                  <input
-                    type="time"
+                  <PeriodTimeInput
                     value={period.endTime}
-                    onChange={(event) =>
-                      updatePeriod(index, "endTime", event.target.value)
+                    onChange={(value) =>
+                      updatePeriod(index, "endTime", value)
+                    }
+                    onInvalid={() =>
+                      setError(`${period.label || "This period"} has an invalid end time. Use 12-hour format like 08:35 AM.`)
                     }
                     className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
                   />
