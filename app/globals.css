@@ -299,6 +299,41 @@ a {
   min-width: 980px;
 }
 
+.schedule-admin-timetable-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.4rem;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-gutter: stable both-edges;
+  cursor: grab;
+  user-select: none;
+}
+
+.schedule-admin-timetable-table {
+  min-width: 1460px;
+  width: max-content;
+}
+
+.schedule-admin-timetable-scroll.is-dragging {
+  cursor: grabbing;
+}
+
+.schedule-admin-timetable-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.schedule-admin-timetable-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.schedule-admin-timetable-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .schedule-admin-edit-grid {
   display: grid;
   gap: 1rem;

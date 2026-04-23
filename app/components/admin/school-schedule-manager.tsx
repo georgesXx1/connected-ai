@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   ClassPeriodOverride,
@@ -15,9 +15,11 @@ import type {
 
 type ScheduleTab = "classes" | "teachers" | "periods" | "timetables";
 type TeacherDraft = TeacherAccount & { password?: string };
+type SchoolScheduleManagerView = "schedule" | "teachers";
 
 type SchoolScheduleManagerProps = {
   initialSchedule: SchoolScheduleData;
+  initialView?: SchoolScheduleManagerView;
 };
 
 const DAY_LABELS: Record<ScheduleDay, string> = {
@@ -217,8 +219,11 @@ function PeriodTimeInput({
 
 export default function SchoolScheduleManager({
   initialSchedule,
+  initialView = "schedule",
 }: SchoolScheduleManagerProps) {
-  const [activeTab, setActiveTab] = useState<ScheduleTab>("classes");
+  const [activeTab, setActiveTab] = useState<ScheduleTab>(
+    initialView === "teachers" ? "teachers" : "classes",
+  );
   const [classes, setClasses] = useState<SchoolClassSection[]>(
     initialSchedule.classes,
   );
@@ -244,9 +249,16 @@ export default function SchoolScheduleManager({
     fullName: "",
     username: "",
     password: "",
-    subjects: "",
+    subject: "",
     classIds: [] as string[],
   });
+  const [selectedTeacherId, setSelectedTeacherId] = useState(
+    initialSchedule.teachers[0]?.id || "",
+  );
+  const [teacherSearch, setTeacherSearch] = useState("");
+  const [teacherSubjectFilter, setTeacherSubjectFilter] = useState("all");
+  const [teacherClassFilter, setTeacherClassFilter] = useState("all");
+  const [teacherSort, setTeacherSort] = useState<"name" | "subject" | "class">("name");
   const [periodForm, setPeriodForm] = useState({
     label: "",
     startTime: "",
@@ -256,6 +268,14 @@ export default function SchoolScheduleManager({
   const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const deferredTeacherSearch = useDeferredValue(teacherSearch.trim().toLowerCase());
+  const timetableScrollRef = useRef<HTMLDivElement | null>(null);
+  const timetableDragState = useRef({
+    pointerId: -1,
+    startX: 0,
+    startScrollLeft: 0,
+    dragging: false,
+  });
 
   const selectedClass = classes.find((entry) => entry.id === selectedClassId);
   const visiblePeriods = periods.length > 0
@@ -278,6 +298,60 @@ export default function SchoolScheduleManager({
     () => new Map(classes.map((classSection) => [classSection.id, classSection])),
     [classes],
   );
+  const teacherSubjectOptions = useMemo(
+    () =>
+      [...new Set(teachers.flatMap((teacher) => teacher.subjects).filter(Boolean))].sort(
+        (left, right) => left.localeCompare(right),
+      ),
+    [teachers],
+  );
+  const teacherOverview = useMemo(() => {
+    const nextTeachers = teachers.filter((teacher) => {
+      const matchesSearch =
+        !deferredTeacherSearch
+        || teacher.fullName.toLowerCase().includes(deferredTeacherSearch)
+        || teacher.username.toLowerCase().includes(deferredTeacherSearch)
+        || teacher.subjects.some((subject) =>
+          subject.toLowerCase().includes(deferredTeacherSearch),
+        );
+      const matchesSubject =
+        teacherSubjectFilter === "all" || teacher.subjects.includes(teacherSubjectFilter);
+      const matchesClass =
+        teacherClassFilter === "all" || teacher.classIds.includes(teacherClassFilter);
+
+      return matchesSearch && matchesSubject && matchesClass;
+    });
+
+    nextTeachers.sort((left, right) => {
+      if (teacherSort === "subject") {
+        return (left.subjects[0] || "").localeCompare(right.subjects[0] || "")
+          || left.fullName.localeCompare(right.fullName);
+      }
+
+      if (teacherSort === "class") {
+        const leftClass = classById.get(left.classIds[0] || "")?.displayLabel
+          || classById.get(left.classIds[0] || "")?.name
+          || "";
+        const rightClass = classById.get(right.classIds[0] || "")?.displayLabel
+          || classById.get(right.classIds[0] || "")?.name
+          || "";
+
+        return leftClass.localeCompare(rightClass) || left.fullName.localeCompare(right.fullName);
+      }
+
+      return left.fullName.localeCompare(right.fullName);
+    });
+
+    return nextTeachers;
+  }, [
+    classById,
+    deferredTeacherSearch,
+    teacherClassFilter,
+    teacherSort,
+    teacherSubjectFilter,
+    teachers,
+  ]);
+  const selectedTeacher = teachers.find((teacher) => teacher.id === selectedTeacherId) || null;
   const selectedClassPeriods = useMemo(
     () => (
       selectedClass
@@ -305,9 +379,69 @@ export default function SchoolScheduleManager({
     [classPeriodOverrides, selectedClass, visiblePeriods],
   );
 
+  useEffect(() => {
+    if (!teachers.length) {
+      if (selectedTeacherId) {
+        setSelectedTeacherId("");
+      }
+      return;
+    }
+
+    if (!selectedTeacherId || !teachers.some((teacher) => teacher.id === selectedTeacherId)) {
+      setSelectedTeacherId(teachers[0].id);
+    }
+  }, [selectedTeacherId, teachers]);
+
   function clearMessages() {
     setSuccess("");
     setError("");
+  }
+
+  function handleTimetablePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    const container = timetableScrollRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    timetableDragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startScrollLeft: container.scrollLeft,
+      dragging: true,
+    };
+
+    container.setPointerCapture(event.pointerId);
+    container.classList.add("is-dragging");
+  }
+
+  function handleTimetablePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const container = timetableScrollRef.current;
+    const dragState = timetableDragState.current;
+
+    if (!container || !dragState.dragging || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - dragState.startX;
+    container.scrollLeft = dragState.startScrollLeft - deltaX;
+  }
+
+  function handleTimetablePointerEnd(event: React.PointerEvent<HTMLDivElement>) {
+    const container = timetableScrollRef.current;
+    const dragState = timetableDragState.current;
+
+    if (!container || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    dragState.dragging = false;
+    dragState.pointerId = -1;
+    container.classList.remove("is-dragging");
+
+    if (container.hasPointerCapture(event.pointerId)) {
+      container.releasePointerCapture(event.pointerId);
+    }
   }
 
   function getClassPeriodOverrideFor(classId: string, periodIndex: number) {
@@ -465,7 +599,7 @@ export default function SchoolScheduleManager({
       username,
       password,
       passwordHash: "",
-      subjects: splitList(teacherForm.subjects),
+      subjects: teacherForm.subject.trim() ? [teacherForm.subject.trim()] : [],
       classIds: teacherForm.classIds,
       status: "active",
       createdAt: timestamp,
@@ -473,11 +607,12 @@ export default function SchoolScheduleManager({
     };
 
     setTeachers((current) => [...current, nextTeacher]);
+    setSelectedTeacherId(nextTeacher.id);
     setTeacherForm({
       fullName: "",
       username: "",
       password: "",
-      subjects: "",
+      subject: "",
       classIds: [],
     });
   }
@@ -530,6 +665,10 @@ export default function SchoolScheduleManager({
           : entry,
       ),
     );
+    if (selectedTeacherId === teacherId) {
+      const nextTeacher = teachers.find((teacher) => teacher.id !== teacherId);
+      setSelectedTeacherId(nextTeacher?.id || "");
+    }
   }
 
   function addPeriod() {
@@ -798,10 +937,12 @@ export default function SchoolScheduleManager({
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-[30px] border border-white/10 bg-white/[0.04] p-5">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-            School Schedule
+            {initialView === "teachers" ? "Teachers" : "School Schedule"}
           </p>
           <p className="mt-2 text-sm leading-7 text-zinc-400">
-            Manage class sections, teacher accounts, and weekly timetables.
+            {initialView === "teachers"
+              ? "Manage teacher accounts, review assigned classes, and open editable teacher profiles."
+              : "Manage class sections, periods, and weekly timetables."}
           </p>
         </div>
         <button
@@ -810,12 +951,17 @@ export default function SchoolScheduleManager({
           disabled={isSaving}
           className="inline-flex h-11 items-center justify-center rounded-2xl bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:opacity-60"
         >
-          {isSaving ? "Saving..." : "Save schedule system"}
+          {isSaving
+            ? "Saving..."
+            : initialView === "teachers"
+              ? "Save teacher accounts"
+              : "Save schedule system"}
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 rounded-[26px] border border-white/10 bg-white/[0.04] p-2">
-        {(["classes", "teachers", "periods", "timetables"] as ScheduleTab[]).map((tab) => (
+      {initialView === "schedule" ? (
+        <div className="flex flex-wrap gap-2 rounded-[26px] border border-white/10 bg-white/[0.04] p-2">
+        {(["classes", "periods", "timetables"] as ScheduleTab[]).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -832,7 +978,8 @@ export default function SchoolScheduleManager({
             {tab}
           </button>
         ))}
-      </div>
+        </div>
+      ) : null}
 
       {success ? (
         <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
@@ -951,10 +1098,11 @@ export default function SchoolScheduleManager({
       ) : null}
 
       {activeTab === "teachers" ? (
-        <div className="schedule-admin-split schedule-admin-split--teachers">
-          <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
+        <div className="space-y-6">
+          <div className="grid gap-6 xl:grid-cols-[minmax(320px,360px)_minmax(0,1fr)]">
+            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-              New teacher account
+              Add a teacher
             </p>
             <div className="mt-6 space-y-4">
               <input
@@ -980,7 +1128,7 @@ export default function SchoolScheduleManager({
                 className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none placeholder:text-zinc-500"
               />
               <input
-                type="password"
+                type="text"
                 value={teacherForm.password}
                 onChange={(event) =>
                   setTeacherForm((current) => ({
@@ -992,16 +1140,20 @@ export default function SchoolScheduleManager({
                 className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none placeholder:text-zinc-500"
               />
               <input
-                value={teacherForm.subjects}
+                value={teacherForm.subject}
                 onChange={(event) =>
                   setTeacherForm((current) => ({
                     ...current,
-                    subjects: event.target.value,
+                    subject: event.target.value,
                   }))
                 }
-                placeholder="Subjects, comma separated"
+                placeholder="Subject"
                 className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none placeholder:text-zinc-500"
               />
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                  Grades / classes
+                </p>
               <div className="flex flex-wrap gap-2">
                 {classes.map((classSection) => (
                   <button
@@ -1025,6 +1177,7 @@ export default function SchoolScheduleManager({
                   </button>
                 ))}
               </div>
+              </div>
               <button
                 type="button"
                 onClick={addTeacher}
@@ -1035,76 +1188,110 @@ export default function SchoolScheduleManager({
             </div>
           </div>
 
-          <div className="schedule-admin-list space-y-4">
-            {teachers.length === 0 ? (
-              <div className="rounded-[24px] border border-white/10 bg-black/20 p-5 text-sm text-zinc-400">
-                No teacher accounts yet.
+            <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
+                    Teachers overview
+                  </p>
+                  <p className="mt-2 text-sm text-zinc-400">
+                    Browse each teacher account, then open the profile to edit details.
+                  </p>
+                </div>
+                <div className="grid gap-2 text-right">
+                  <span className="text-2xl font-semibold text-white">{teachers.length}</span>
+                  <span className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+                    Total teachers
+                  </span>
+                </div>
               </div>
-            ) : (
-              teachers.map((teacher) => (
-                <div
-                  key={teacher.id}
-                  className="schedule-admin-card rounded-[26px] border border-white/10 bg-black/20 p-5"
-                >
-                  <div className="schedule-admin-edit-grid schedule-admin-edit-grid--two">
-                    <input
-                      value={teacher.fullName}
-                      onChange={(event) =>
-                        updateTeacher(teacher.id, "fullName", event.target.value)
-                      }
-                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
-                    />
-                    <input
-                      value={teacher.username}
-                      onChange={(event) =>
-                        updateTeacher(teacher.id, "username", event.target.value)
-                      }
-                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
-                    />
-                    <input
-                      type="password"
-                      value={teacher.password || ""}
-                      onChange={(event) =>
-                        updateTeacher(teacher.id, "password", event.target.value)
-                      }
-                      placeholder="New password (leave blank to keep)"
-                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none placeholder:text-zinc-600"
-                    />
-                    <select
-                      value={teacher.status}
-                      onChange={(event) =>
-                        updateTeacher(teacher.id, "status", event.target.value)
-                      }
-                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
+
+              <div className="mt-6 space-y-4">
+                <input
+                  value={teacherSearch}
+                  onChange={(event) => setTeacherSearch(event.target.value)}
+                  placeholder="Search by teacher, username, or subject"
+                  className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none placeholder:text-zinc-500"
+                />
+
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                    Sort overview
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {(["name", "subject", "class"] as const).map((sortKey) => (
+                      <button
+                        key={sortKey}
+                        type="button"
+                        onClick={() => setTeacherSort(sortKey)}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                          teacherSort === sortKey
+                            ? "border-cyan-400/25 bg-cyan-400/10 text-white"
+                            : "border-white/10 bg-black/20 text-zinc-300"
+                        }`}
+                      >
+                        {sortKey}
+                      </button>
+                    ))}
                   </div>
-                  <input
-                    value={joinList(teacher.subjects)}
-                    onChange={(event) =>
-                      updateTeacherList(teacher.id, "subjects", event.target.value)
-                    }
-                    placeholder="Subjects"
-                    className="mt-4 h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
-                  />
-                  <div className="mt-4 flex flex-wrap gap-2">
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                    Filter by subject
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTeacherSubjectFilter("all")}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                        teacherSubjectFilter === "all"
+                          ? "border-cyan-400/25 bg-cyan-400/10 text-white"
+                          : "border-white/10 bg-black/20 text-zinc-300"
+                      }`}
+                    >
+                      All subjects
+                    </button>
+                    {teacherSubjectOptions.map((subject) => (
+                      <button
+                        key={subject}
+                        type="button"
+                        onClick={() => setTeacherSubjectFilter(subject)}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                          teacherSubjectFilter === subject
+                            ? "border-cyan-400/25 bg-cyan-400/10 text-white"
+                            : "border-white/10 bg-black/20 text-zinc-300"
+                        }`}
+                      >
+                        {subject}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                    Filter by class
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTeacherClassFilter("all")}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                        teacherClassFilter === "all"
+                          ? "border-cyan-400/25 bg-cyan-400/10 text-white"
+                          : "border-white/10 bg-black/20 text-zinc-300"
+                      }`}
+                    >
+                      All classes
+                    </button>
                     {classes.map((classSection) => (
                       <button
                         key={classSection.id}
                         type="button"
-                        onClick={() =>
-                          updateTeacherList(
-                            teacher.id,
-                            "classIds",
-                            teacher.classIds.includes(classSection.id)
-                              ? teacher.classIds.filter((id) => id !== classSection.id)
-                              : [...teacher.classIds, classSection.id],
-                          )
-                        }
-                        className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                          teacher.classIds.includes(classSection.id)
+                        onClick={() => setTeacherClassFilter(classSection.id)}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                          teacherClassFilter === classSection.id
                             ? "border-cyan-400/25 bg-cyan-400/10 text-white"
                             : "border-white/10 bg-black/20 text-zinc-300"
                         }`}
@@ -1113,15 +1300,173 @@ export default function SchoolScheduleManager({
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="space-y-3">
+                  {teacherOverview.length === 0 ? (
+                    <div className="rounded-[24px] border border-white/10 bg-black/20 p-5 text-sm text-zinc-400">
+                      No teacher accounts match the current filters.
+                    </div>
+                  ) : (
+                    teacherOverview.map((teacher) => (
+                      <button
+                        key={teacher.id}
+                        type="button"
+                        onClick={() => setSelectedTeacherId(teacher.id)}
+                        className={`w-full rounded-[24px] border p-4 text-left transition ${
+                          selectedTeacherId === teacher.id
+                            ? "border-cyan-400/25 bg-cyan-400/10"
+                            : "border-white/10 bg-black/20 hover:border-white/20 hover:bg-white/[0.05]"
+                        }`}
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-base font-semibold text-white">{teacher.fullName}</p>
+                            <p className="mt-1 text-sm text-zinc-400">@{teacher.username}</p>
+                          </div>
+                          <span
+                            className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
+                              teacher.status === "active"
+                                ? "bg-emerald-400/12 text-emerald-200"
+                                : "bg-zinc-500/15 text-zinc-300"
+                            }`}
+                          >
+                            {teacher.status}
+                          </span>
+                        </div>
+                        <p className="mt-3 text-sm text-zinc-300">
+                          Subject: {teacher.subjects[0] || "Not assigned"}
+                        </p>
+                        <p className="mt-1 text-sm text-zinc-400">
+                          Classes:{" "}
+                          {teacher.classIds.length
+                            ? teacher.classIds
+                                .map((classId) => classById.get(classId))
+                                .filter(Boolean)
+                                .map((classSection) => classLabel(classSection as SchoolClassSection))
+                                .join(", ")
+                            : "No classes yet"}
+                        </p>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
+              Teacher profile
+            </p>
+            {selectedTeacher ? (
+              <>
+                <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                  <input
+                    value={selectedTeacher.fullName}
+                    onChange={(event) =>
+                      updateTeacher(selectedTeacher.id, "fullName", event.target.value)
+                    }
+                    placeholder="Full name"
+                    className="h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
+                  />
+                  <input
+                    value={selectedTeacher.username}
+                    onChange={(event) =>
+                      updateTeacher(selectedTeacher.id, "username", event.target.value)
+                    }
+                    placeholder="Username"
+                    className="h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                  />
+                  <div className="rounded-[24px] border border-white/10 bg-black/20 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                      Change password
+                    </p>
+                    <p className="mt-2 text-xs leading-6 text-zinc-500">
+                      Enter a new password here if you want to replace the current one.
+                    </p>
+                    <input
+                      type="text"
+                      value={selectedTeacher.password || ""}
+                      onChange={(event) =>
+                        updateTeacher(selectedTeacher.id, "password", event.target.value)
+                      }
+                      placeholder="Enter a new password"
+                      className="mt-3 h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none placeholder:text-zinc-600"
+                    />
+                  </div>
+                  <select
+                    value={selectedTeacher.status}
+                    onChange={(event) =>
+                      updateTeacher(selectedTeacher.id, "status", event.target.value)
+                    }
+                    className="h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+
+                <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(240px,320px)_minmax(0,1fr)]">
+                  <div className="rounded-[24px] border border-white/10 bg-black/20 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                      Subject
+                    </p>
+                    <input
+                      value={joinList(selectedTeacher.subjects)}
+                      onChange={(event) =>
+                        updateTeacherList(selectedTeacher.id, "subjects", event.target.value)
+                      }
+                      placeholder="Subject"
+                      className="mt-3 h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+                    />
+                  </div>
+
+                  <div className="rounded-[24px] border border-white/10 bg-black/20 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+                      Grades / classes
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {classes.map((classSection) => (
+                        <button
+                          key={classSection.id}
+                          type="button"
+                          onClick={() =>
+                            updateTeacherList(
+                              selectedTeacher.id,
+                              "classIds",
+                              selectedTeacher.classIds.includes(classSection.id)
+                                ? selectedTeacher.classIds.filter((id) => id !== classSection.id)
+                                : [...selectedTeacher.classIds, classSection.id],
+                            )
+                          }
+                          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                            selectedTeacher.classIds.includes(classSection.id)
+                              ? "border-cyan-400/25 bg-cyan-400/10 text-white"
+                              : "border-white/10 bg-[#0f1319] text-zinc-300"
+                          }`}
+                        >
+                          {classLabel(classSection)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={() => deleteTeacher(teacher.id)}
-                    className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-400/15"
+                    onClick={() => deleteTeacher(selectedTeacher.id)}
+                    className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-400/15"
                   >
-                    Delete
+                    Delete teacher
                   </button>
                 </div>
-              ))
+              </>
+            ) : (
+              <div className="mt-6 rounded-[24px] border border-white/10 bg-black/20 p-5 text-sm text-zinc-400">
+                Select a teacher from the overview to open the profile.
+              </div>
             )}
           </div>
         </div>
@@ -1281,8 +1626,15 @@ export default function SchoolScheduleManager({
           </div>
 
           {selectedClass ? (
-            <div className="overflow-x-auto rounded-[30px] border border-white/10 bg-black/20">
-              <table className="min-w-[1100px] w-full border-collapse text-left">
+            <div
+              ref={timetableScrollRef}
+              className="schedule-admin-timetable-scroll rounded-[30px] border border-white/10 bg-black/20"
+              onPointerDown={handleTimetablePointerDown}
+              onPointerMove={handleTimetablePointerMove}
+              onPointerUp={handleTimetablePointerEnd}
+              onPointerCancel={handleTimetablePointerEnd}
+            >
+              <table className="schedule-admin-timetable-table border-collapse text-left">
                 <thead>
                   <tr className="border-b border-white/10">
                     <th className="w-28 px-4 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
@@ -1355,7 +1707,7 @@ export default function SchoolScheduleManager({
                           const isRecess = period.type === "recess" || entry?.type === "recess";
 
                           return (
-                            <td key={day} className="min-w-[190px] px-3 py-4 align-top">
+                            <td key={day} className="min-w-[240px] px-3 py-4 align-top">
                               <div className="space-y-3 rounded-[20px] border border-white/10 bg-[#0f1319] p-3">
                                 <label className="flex items-center gap-2 text-xs font-semibold text-zinc-300">
                                   <input

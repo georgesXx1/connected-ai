@@ -30,6 +30,19 @@
       "status": "active",
       "createdAt": "2026-04-22T18:47:07.980Z",
       "updatedAt": "2026-04-22T18:47:07.980Z"
+    },
+    {
+      "id": "teacher-3c6742be-c26f-45f7-b8ae-d8eb8be95619",
+      "fullName": "Wissam",
+      "username": "wissam 11",
+      "passwordHash": "pbkdf2$120000$pbSQRXYvJAUT08BxOPCW4w$UAW4KWMOqP0zIHOboAzlBAGb2lnEzV7QunklMDeQRu8",
+      "subjects": [
+        "Informatics"
+      ],
+      "classIds": [],
+      "status": "active",
+      "createdAt": "2026-04-23T18:34:34.200Z",
+      "updatedAt": "2026-04-23T18:34:34.200Z"
     }
   ],
   "periods": [
@@ -156,5 +169,5 @@
       "updatedAt": "2026-04-22T18:53:31.182Z"
     }
   ],
-  "updatedAt": "2026-04-23T15:38:36.809Z"
+  "updatedAt": "2026-04-23T18:35:09.751Z"
 }

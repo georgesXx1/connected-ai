@@ -18,7 +18,13 @@ import type {
 import type { SchoolScheduleData } from "@/lib/school-schedule";
 
 type Language = "en" | "fr" | "ar";
-type AdminSection = "dashboard" | "rules" | "public" | "schedule" | "settings";
+type AdminSection =
+  | "dashboard"
+  | "rules"
+  | "public"
+  | "teachers"
+  | "schedule"
+  | "settings";
 type RuleManagerMode = "add" | "edit" | "trash";
 type ChatMessage = {
   id: string;
@@ -156,12 +162,17 @@ type TranslationSet = {
     title: string;
     description: string;
   };
+  teachers: {
+    title: string;
+    description: string;
+  };
 };
 
 const SIDEBAR_ICONS: Record<AdminSection, string> = {
   dashboard: "D",
   rules: "R",
   public: "P",
+  teachers: "T",
   schedule: "S",
   settings: "A",
 };
@@ -194,6 +205,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       dashboard: "Dashboard",
       rules: "Rules Manager",
       public: "Public Information",
+      teachers: "Teachers",
       schedule: "School Schedule",
       settings: "Settings / Access",
     },
@@ -313,7 +325,12 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
     schedule: {
       title: "School Schedule",
       description:
-        "Create class sections, manage teacher accounts, and build conflict-safe weekly timetables.",
+        "Create class sections, manage periods, and build conflict-safe weekly timetables.",
+    },
+    teachers: {
+      title: "Teachers",
+      description:
+        "Open a teacher overview, sort and filter accounts by subject or class, and edit each teacher profile.",
     },
   },
   fr: {
@@ -332,6 +349,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       dashboard: "Tableau de bord",
       rules: "Gestion des regles",
       public: "Informations publiques",
+      teachers: "Enseignants",
       schedule: "School Schedule",
       settings: "Parametres / Acces",
     },
@@ -451,7 +469,12 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
     schedule: {
       title: "School Schedule",
       description:
-        "Creez les sections, les comptes enseignants et les emplois du temps hebdomadaires sans conflit.",
+        "Creez les sections, gerez les periodes et construisez des emplois du temps hebdomadaires sans conflit.",
+    },
+    teachers: {
+      title: "Enseignants",
+      description:
+        "Parcourez les comptes enseignants, filtrez-les par matiere ou classe et modifiez chaque profil.",
     },
   },
   ar: {
@@ -470,6 +493,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       dashboard: "لوحة التحكم",
       rules: "إدارة القوانين",
       public: "المعلومات العامة",
+      teachers: "المعلمون",
       settings: "الإعدادات / الوصول",
     },
     dashboard: {
@@ -583,7 +607,12 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
     schedule: {
       title: "School Schedule",
       description:
-        "Create class sections, teacher accounts, and weekly timetables with conflict protection.",
+        "Create class sections, manage periods, and weekly timetables with conflict protection.",
+    },
+    teachers: {
+      title: "المعلمون",
+      description:
+        "افتح نظرة عامة على حسابات المعلمين، ورتبها حسب المادة أو الصف، ثم عدل ملف كل معلم.",
     },
   },
 };
@@ -794,7 +823,12 @@ export default function AdminPortal({
   const textDirection = isArabic ? "rtl" : "ltr";
   const textAlignClass = isArabic ? "text-right" : "text-left";
   const sectionLabel = (section: AdminSection) =>
-    t.sections[section] || (section === "schedule" ? t.schedule.title : section);
+    t.sections[section]
+    || (section === "schedule"
+      ? t.schedule.title
+      : section === "teachers"
+        ? t.teachers.title
+        : section);
 
   const initialRules = initialContent?.rules ?? [];
   const initialPublicInfo = initialContent?.publicInfo ?? createFallbackPublicInfo();
@@ -1618,7 +1652,7 @@ export default function AdminPortal({
         </div>
 
         <nav className="mt-8 flex flex-1 flex-col gap-3">
-          {(["dashboard", "rules", "public", "schedule", "settings"] as AdminSection[]).map(
+          {(["dashboard", "rules", "public", "teachers", "schedule", "settings"] as AdminSection[]).map(
             (section) => (
               <button
                 key={section}
@@ -1681,6 +1715,8 @@ export default function AdminPortal({
                         ? t.rules.title
                         : activeSection === "public"
                           ? t.publicInfo.title
+                          : activeSection === "teachers"
+                            ? t.teachers.title
                           : activeSection === "schedule"
                             ? t.schedule.title
                             : t.settings.title}
@@ -1692,6 +1728,8 @@ export default function AdminPortal({
                         ? t.rules.addDescription
                         : activeSection === "public"
                           ? t.publicInfo.description
+                          : activeSection === "teachers"
+                            ? t.teachers.description
                           : activeSection === "schedule"
                             ? t.schedule.description
                             : t.settings.description}
@@ -2392,8 +2430,18 @@ export default function AdminPortal({
                 </div>
               ) : null}
 
+              {activeSection === "teachers" ? (
+                <SchoolScheduleManager
+                  initialSchedule={initialSchoolSchedule}
+                  initialView="teachers"
+                />
+              ) : null}
+
               {activeSection === "schedule" ? (
-                <SchoolScheduleManager initialSchedule={initialSchoolSchedule} />
+                <SchoolScheduleManager
+                  initialSchedule={initialSchoolSchedule}
+                  initialView="schedule"
+                />
               ) : null}
 
               {activeSection === "settings" ? (
