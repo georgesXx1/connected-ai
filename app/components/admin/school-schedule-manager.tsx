@@ -1637,7 +1637,7 @@ export default function SchoolScheduleManager({
               <table className="schedule-admin-timetable-table border-collapse text-left">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="w-28 px-4 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
+                    <th className="min-w-[360px] px-4 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
                       Period
                     </th>
                     {SCHEDULE_DAYS.map((day) => (
@@ -1663,7 +1663,7 @@ export default function SchoolScheduleManager({
                   ) : (
                     selectedClassPeriods.map(({ period, periodIndex }) => (
                       <tr key={period.id} className="border-b border-white/10 last:border-b-0">
-                        <td className="px-4 py-4 align-top text-sm font-semibold text-white">
+                        <td className="min-w-[360px] px-4 py-4 align-top text-sm font-semibold text-white">
                           <div>{period.label}</div>
                           <div className="mt-1 text-xs font-normal text-zinc-500">
                             {period.startTime && period.endTime
@@ -1696,7 +1696,7 @@ export default function SchoolScheduleManager({
                             <button
                               type="button"
                               onClick={() => deleteClassPeriod(selectedClass.id, periodIndex)}
-                              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-rose-400/30 bg-rose-500/18 px-3 py-2 text-xs font-semibold text-rose-50 transition hover:bg-rose-500/28"
+                              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-rose-400/30 bg-rose-500/18 px-3 py-2 text-xs font-semibold text-rose-50 whitespace-nowrap transition hover:bg-rose-500/28"
                             >
                               Delete this period for {classLabel(selectedClass)}
                             </button>
