@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import type {
+  ClassPeriodOverride,
   PublicTeacherAccount,
   ScheduleDay,
   ScheduleEntry,
@@ -227,6 +228,9 @@ export default function SchoolScheduleManager({
   const [periods, setPeriods] = useState<SchedulePeriod[]>(
     initialSchedule.periods,
   );
+  const [classPeriodOverrides, setClassPeriodOverrides] = useState<ClassPeriodOverride[]>(
+    initialSchedule.classPeriodOverrides ?? [],
+  );
   const [entries, setEntries] = useState<ScheduleEntry[]>(initialSchedule.entries);
   const [selectedClassId, setSelectedClassId] = useState(
     initialSchedule.classes[0]?.id || "",
@@ -274,10 +278,106 @@ export default function SchoolScheduleManager({
     () => new Map(classes.map((classSection) => [classSection.id, classSection])),
     [classes],
   );
+  const selectedClassPeriods = useMemo(
+    () => (
+      selectedClass
+        ? visiblePeriods
+            .map((period, periodIndex) => {
+              const override = classPeriodOverrides.find(
+                (entry) =>
+                  entry.classId === selectedClass.id &&
+                  entry.periodIndex === periodIndex,
+              );
+
+              return {
+                periodIndex,
+                period: {
+                  ...period,
+                  startTime: override ? override.startTime : period.startTime,
+                  endTime: override ? override.endTime : period.endTime,
+                  hidden: override?.hidden ?? false,
+                },
+              };
+            })
+            .filter((entry) => !entry.period.hidden)
+        : []
+    ),
+    [classPeriodOverrides, selectedClass, visiblePeriods],
+  );
 
   function clearMessages() {
     setSuccess("");
     setError("");
+  }
+
+  function getClassPeriodOverrideFor(classId: string, periodIndex: number) {
+    return classPeriodOverrides.find(
+      (override) => override.classId === classId && override.periodIndex === periodIndex,
+    );
+  }
+
+  function getClassPeriod(classId: string, periodIndex: number) {
+    const period = visiblePeriods[periodIndex];
+
+    if (!period) {
+      return null;
+    }
+
+    const override = getClassPeriodOverrideFor(classId, periodIndex);
+
+    return {
+      ...period,
+      startTime: override ? override.startTime : period.startTime,
+      endTime: override ? override.endTime : period.endTime,
+      hidden: override?.hidden ?? false,
+    };
+  }
+
+  function upsertClassPeriodOverride(
+    classId: string,
+    periodIndex: number,
+    patch: Partial<Pick<ClassPeriodOverride, "startTime" | "endTime" | "hidden">>,
+  ) {
+    setClassPeriodOverrides((current) => {
+      const existing = current.find(
+        (override) => override.classId === classId && override.periodIndex === periodIndex,
+      );
+      const basePeriod = visiblePeriods[periodIndex];
+
+      if (!basePeriod) {
+        return current;
+      }
+
+      const nextOverride: ClassPeriodOverride = {
+        id: existing?.id || createClientId("class-period"),
+        classId,
+        periodIndex,
+        startTime: existing ? existing.startTime : basePeriod.startTime,
+        endTime: existing ? existing.endTime : basePeriod.endTime,
+        hidden: existing?.hidden ?? false,
+        updatedAt: nowIso(),
+        ...patch,
+      };
+
+      const matchesBase =
+        nextOverride.startTime === basePeriod.startTime &&
+        nextOverride.endTime === basePeriod.endTime &&
+        !nextOverride.hidden;
+
+      if (matchesBase) {
+        return current.filter(
+          (override) => !(override.classId === classId && override.periodIndex === periodIndex),
+        );
+      }
+
+      return existing
+        ? current.map((override) =>
+            override.classId === classId && override.periodIndex === periodIndex
+              ? nextOverride
+              : override,
+          )
+        : [...current, nextOverride];
+    });
   }
 
   function addClassSection() {
@@ -326,6 +426,9 @@ export default function SchoolScheduleManager({
   function deleteClassSection(classId: string) {
     clearMessages();
     setClasses((current) => current.filter((classSection) => classSection.id !== classId));
+    setClassPeriodOverrides((current) =>
+      current.filter((override) => override.classId !== classId),
+    );
     setEntries((current) => current.filter((entry) => entry.classId !== classId));
     setTeachers((current) =>
       current.map((teacher) => ({
@@ -497,6 +600,19 @@ export default function SchoolScheduleManager({
   function deletePeriod(periodIndex: number) {
     clearMessages();
     setPeriods((current) => current.filter((_period, index) => index !== periodIndex));
+    setClassPeriodOverrides((current) =>
+      current
+        .filter((override) => override.periodIndex !== periodIndex)
+        .map((override) =>
+          override.periodIndex > periodIndex
+            ? {
+                ...override,
+                periodIndex: override.periodIndex - 1,
+                updatedAt: nowIso(),
+              }
+            : override,
+        ),
+    );
     setEntries((current) =>
       current
         .filter((entry) => entry.periodIndex !== periodIndex)
@@ -505,6 +621,26 @@ export default function SchoolScheduleManager({
             ? { ...entry, periodIndex: entry.periodIndex - 1, updatedAt: nowIso() }
             : entry,
         ),
+    );
+  }
+
+  function updateClassPeriodTime(
+    classId: string,
+    periodIndex: number,
+    field: "startTime" | "endTime",
+    value: string,
+  ) {
+    clearMessages();
+    upsertClassPeriodOverride(classId, periodIndex, { [field]: value });
+  }
+
+  function deleteClassPeriod(classId: string, periodIndex: number) {
+    clearMessages();
+    upsertClassPeriodOverride(classId, periodIndex, { hidden: true });
+    setEntries((current) =>
+      current.filter(
+        (entry) => !(entry.classId === classId && entry.periodIndex === periodIndex),
+      ),
     );
   }
 
@@ -587,9 +723,21 @@ export default function SchoolScheduleManager({
   async function saveSchedule() {
     clearMessages();
     const timeError = getInvalidTimeMessage(periods);
+    const classOverrideTimeError = getInvalidTimeMessage(
+      classPeriodOverrides.map((override) => ({
+        label: `${classById.get(override.classId)?.displayLabel || classById.get(override.classId)?.name || "Class"} - ${visiblePeriods[override.periodIndex]?.label || `Period ${override.periodIndex + 1}`}`,
+        startTime: override.startTime,
+        endTime: override.endTime,
+      })),
+    );
 
     if (timeError) {
       setError(timeError);
+      return;
+    }
+
+    if (classOverrideTimeError) {
+      setError(classOverrideTimeError);
       return;
     }
 
@@ -611,6 +759,7 @@ export default function SchoolScheduleManager({
             classes,
             teachers,
             periods,
+            classPeriodOverrides,
             entries,
             updatedAt: nowIso(),
           },
@@ -630,6 +779,7 @@ export default function SchoolScheduleManager({
         })),
       );
       setPeriods(payload.schedule.periods);
+      setClassPeriodOverrides(payload.schedule.classPeriodOverrides ?? []);
       setEntries(payload.schedule.entries);
       setSuccess("School schedule saved successfully.");
     } catch (saveError) {
@@ -1046,62 +1196,64 @@ export default function SchoolScheduleManager({
             </div>
           </div>
 
-          <div className="schedule-admin-list space-y-4">
-            {visiblePeriods.map((period, index) => (
-              <div
-                key={period.id}
-                className="schedule-admin-card rounded-[26px] border border-white/10 bg-black/20 p-5"
-              >
-                <div className="schedule-admin-edit-grid schedule-admin-edit-grid--period">
-                  <input
-                    value={period.label}
-                    onChange={(event) =>
-                      updatePeriod(index, "label", event.target.value)
-                    }
-                    className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm font-semibold text-white outline-none"
-                  />
-                  <PeriodTimeInput
-                    value={period.startTime}
-                    onChange={(value) =>
-                      updatePeriod(index, "startTime", value)
-                    }
-                    onInvalid={() =>
-                      setError(`${period.label || "This period"} has an invalid start time. Use 12-hour format like 07:45 AM.`)
-                    }
-                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
-                  />
-                  <PeriodTimeInput
-                    value={period.endTime}
-                    onChange={(value) =>
-                      updatePeriod(index, "endTime", value)
-                    }
-                    onInvalid={() =>
-                      setError(`${period.label || "This period"} has an invalid end time. Use 12-hour format like 08:35 AM.`)
-                    }
-                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
-                  />
-                  <select
-                    value={period.type}
-                    onChange={(event) =>
-                      updatePeriod(index, "type", event.target.value)
-                    }
-                    className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
-                  >
-                    <option value="class">Class</option>
-                    <option value="recess">Recess</option>
-                  </select>
-                  <div className="schedule-admin-delete-row">
-                    <button
-                      type="button"
-                      onClick={() => deletePeriod(index)}
-                      className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-400/15"
+          <div className="schedule-admin-list schedule-admin-periods-scroll">
+            <div className="schedule-admin-periods-rows">
+              {visiblePeriods.map((period, index) => (
+                <div
+                  key={period.id}
+                  className="schedule-admin-card schedule-admin-period-card rounded-[26px] border border-white/10 bg-black/20 p-5"
+                >
+                  <div className="schedule-admin-edit-grid schedule-admin-edit-grid--period">
+                    <input
+                      value={period.label}
+                      onChange={(event) =>
+                        updatePeriod(index, "label", event.target.value)
+                      }
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm font-semibold text-white outline-none"
+                    />
+                    <PeriodTimeInput
+                      value={period.startTime}
+                      onChange={(value) =>
+                        updatePeriod(index, "startTime", value)
+                      }
+                      onInvalid={() =>
+                        setError(`${period.label || "This period"} has an invalid start time. Use 12-hour format like 07:45 AM.`)
+                      }
+                      className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
+                    />
+                    <PeriodTimeInput
+                      value={period.endTime}
+                      onChange={(value) =>
+                        updatePeriod(index, "endTime", value)
+                      }
+                      onInvalid={() =>
+                        setError(`${period.label || "This period"} has an invalid end time. Use 12-hour format like 08:35 AM.`)
+                      }
+                      className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
+                    />
+                    <select
+                      value={period.type}
+                      onChange={(event) =>
+                        updatePeriod(index, "type", event.target.value)
+                      }
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
                     >
-                      Delete
-                    </button>
+                      <option value="class">Class</option>
+                      <option value="recess">Recess</option>
+                    </select>
+                    <div className="schedule-admin-delete-row">
+                      <button
+                        type="button"
+                        onClick={() => deletePeriod(index)}
+                        className="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm text-rose-100 transition hover:bg-rose-400/15"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       ) : null}
@@ -1147,120 +1299,162 @@ export default function SchoolScheduleManager({
                   </tr>
                 </thead>
                 <tbody>
-                  {visiblePeriods.map((period, periodIndex) => (
-                    <tr key={period.id} className="border-b border-white/10 last:border-b-0">
-                      <td className="px-4 py-4 align-top text-sm font-semibold text-white">
-                        <div>{period.label}</div>
-                        <div className="mt-1 text-xs font-normal text-zinc-500">
-                          {period.startTime && period.endTime
-                            ? `${period.startTime} - ${period.endTime}`
-                            : "Time not set"}
-                        </div>
+                  {selectedClassPeriods.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={SCHEDULE_DAYS.length + 1}
+                        className="px-4 py-8 text-center text-sm text-zinc-400"
+                      >
+                        No periods are currently active for {classLabel(selectedClass)}.
                       </td>
-                      {SCHEDULE_DAYS.map((day) => {
-                        const entry = getEntry(selectedClass.id, day, periodIndex);
-                        const isRecess = period.type === "recess" || entry?.type === "recess";
+                    </tr>
+                  ) : (
+                    selectedClassPeriods.map(({ period, periodIndex }) => (
+                      <tr key={period.id} className="border-b border-white/10 last:border-b-0">
+                        <td className="px-4 py-4 align-top text-sm font-semibold text-white">
+                          <div>{period.label}</div>
+                          <div className="mt-1 text-xs font-normal text-zinc-500">
+                            {period.startTime && period.endTime
+                              ? `${period.startTime} - ${period.endTime}`
+                              : "Time not set"}
+                          </div>
+                          <div className="mt-3 space-y-3">
+                            <div className="grid gap-3">
+                              <PeriodTimeInput
+                                value={period.startTime}
+                                onChange={(value) =>
+                                  updateClassPeriodTime(selectedClass.id, periodIndex, "startTime", value)
+                                }
+                                onInvalid={() =>
+                                  setError(`${classLabel(selectedClass)} - ${period.label} has an invalid start time. Use 12-hour format like 07:45 AM.`)
+                                }
+                                className="h-10 rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none"
+                              />
+                              <PeriodTimeInput
+                                value={period.endTime}
+                                onChange={(value) =>
+                                  updateClassPeriodTime(selectedClass.id, periodIndex, "endTime", value)
+                                }
+                                onInvalid={() =>
+                                  setError(`${classLabel(selectedClass)} - ${period.label} has an invalid end time. Use 12-hour format like 08:35 AM.`)
+                                }
+                                className="h-10 rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => deleteClassPeriod(selectedClass.id, periodIndex)}
+                              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-rose-400/30 bg-rose-500/18 px-3 py-2 text-xs font-semibold text-rose-50 transition hover:bg-rose-500/28"
+                            >
+                              Delete this period for {classLabel(selectedClass)}
+                            </button>
+                          </div>
+                        </td>
+                        {SCHEDULE_DAYS.map((day) => {
+                          const entry = getEntry(selectedClass.id, day, periodIndex);
+                          const isRecess = period.type === "recess" || entry?.type === "recess";
 
-                        return (
-                          <td key={day} className="min-w-[190px] px-3 py-4 align-top">
-                            <div className="space-y-3 rounded-[20px] border border-white/10 bg-[#0f1319] p-3">
-                              <label className="flex items-center gap-2 text-xs font-semibold text-zinc-300">
+                          return (
+                            <td key={day} className="min-w-[190px] px-3 py-4 align-top">
+                              <div className="space-y-3 rounded-[20px] border border-white/10 bg-[#0f1319] p-3">
+                                <label className="flex items-center gap-2 text-xs font-semibold text-zinc-300">
+                                  <input
+                                    type="checkbox"
+                                    checked={isRecess}
+                                    disabled={period.type === "recess"}
+                                    onChange={(event) =>
+                                      updateScheduleCell(
+                                        selectedClass.id,
+                                        day,
+                                        periodIndex,
+                                        {
+                                          type: event.target.checked ? "recess" : "class",
+                                          subject: event.target.checked ? "Recess" : "",
+                                          teacherId: undefined,
+                                        },
+                                      )
+                                    }
+                                    className="h-4 w-4 accent-cyan-400"
+                                  />
+                                  Recess
+                                </label>
                                 <input
-                                  type="checkbox"
-                                  checked={isRecess}
-                                  disabled={period.type === "recess"}
+                                  value={isRecess ? "Recess" : entry?.subject || ""}
                                   onChange={(event) =>
                                     updateScheduleCell(
                                       selectedClass.id,
                                       day,
                                       periodIndex,
                                       {
-                                        type: event.target.checked ? "recess" : "class",
-                                        subject: event.target.checked ? "Recess" : "",
-                                        teacherId: undefined,
+                                        type: "class",
+                                        subject: event.target.value,
                                       },
                                     )
                                   }
-                                  className="h-4 w-4 accent-cyan-400"
+                                  disabled={isRecess}
+                                  placeholder="Subject"
+                                  className="h-10 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-zinc-600 disabled:opacity-60"
                                 />
-                                Recess
-                              </label>
-                              <input
-                                value={isRecess ? "Recess" : entry?.subject || ""}
-                                onChange={(event) =>
-                                  updateScheduleCell(
-                                    selectedClass.id,
-                                    day,
-                                    periodIndex,
-                                    {
-                                      type: "class",
-                                      subject: event.target.value,
-                                    },
-                                  )
-                                }
-                                disabled={isRecess}
-                                placeholder="Subject"
-                                className="h-10 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none placeholder:text-zinc-600 disabled:opacity-60"
-                              />
-                              <select
-                                value={entry?.teacherId || ""}
-                                onChange={(event) =>
-                                  updateScheduleCell(
-                                    selectedClass.id,
-                                    day,
-                                    periodIndex,
-                                    {
-                                      type: "class",
-                                      teacherId: event.target.value || undefined,
-                                    },
-                                  )
-                                }
-                                disabled={isRecess}
-                                className="h-10 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none disabled:opacity-60"
-                              >
-                                <option value="">Teacher</option>
-                                {teachers
-                                  .filter((teacher) => teacher.status === "active")
-                                  .map((teacher) => (
-                                    <option key={teacher.id} value={teacher.id}>
-                                      {teacher.fullName}
-                                    </option>
-                                  ))}
-                              </select>
-                              {entry ? (
-                                <div className="text-xs leading-5 text-zinc-400">
-                                  {isRecess ? (
-                                    <span>
-                                      Recess
-                                      {period.startTime && period.endTime
-                                        ? ` - ${period.startTime} to ${period.endTime}`
-                                        : ""}
-                                    </span>
-                                  ) : (
-                                    <span>
-                                      {entry.subject || "Subject"} -{" "}
-                                      {publicTeacherName(teacherById.get(entry.teacherId || ""))}
-                                    </span>
-                                  )}
-                                </div>
-                              ) : null}
-                              {entry ? (
+                                <select
+                                  value={entry?.teacherId || ""}
+                                  onChange={(event) =>
+                                    updateScheduleCell(
+                                      selectedClass.id,
+                                      day,
+                                      periodIndex,
+                                      {
+                                        type: "class",
+                                        teacherId: event.target.value || undefined,
+                                      },
+                                    )
+                                  }
+                                  disabled={isRecess}
+                                  className="h-10 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none disabled:opacity-60"
+                                >
+                                  <option value="">Teacher</option>
+                                  {teachers
+                                    .filter((teacher) => teacher.status === "active")
+                                    .map((teacher) => (
+                                      <option key={teacher.id} value={teacher.id}>
+                                        {teacher.fullName}
+                                      </option>
+                                    ))}
+                                </select>
+                                {entry ? (
+                                  <div className="text-xs leading-5 text-zinc-400">
+                                    {isRecess ? (
+                                      <span>
+                                        Recess
+                                        {period.startTime && period.endTime
+                                          ? ` - ${period.startTime} to ${period.endTime}`
+                                          : ""}
+                                      </span>
+                                    ) : (
+                                      <span>
+                                        {entry.subject || "Subject"} -{" "}
+                                        {publicTeacherName(teacherById.get(entry.teacherId || ""))}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : null}
+                                {entry ? (
                                 <button
                                   type="button"
                                   onClick={() =>
                                     clearScheduleCell(selectedClass.id, day, periodIndex)
                                   }
-                                  className="text-xs font-semibold text-rose-200 hover:text-rose-100"
+                                  className="inline-flex min-h-9 items-center justify-center rounded-lg border border-cyan-300/25 bg-cyan-400/12 px-3 py-1.5 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-400/20 hover:text-white"
                                 >
                                   Clear
                                 </button>
-                              ) : null}
-                            </div>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
+                                ) : null}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -1277,27 +1471,31 @@ export default function SchoolScheduleManager({
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {entries
                 .filter((entry) => entry.type === "class" && entry.teacherId)
-                .map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="rounded-[18px] border border-white/10 bg-black/20 p-4 text-sm text-zinc-300"
-                  >
-                    <p className="font-semibold text-white">
-                      {entry.subject || "Subject"} -{" "}
-                      {publicTeacherName(teacherById.get(entry.teacherId || ""))}
-                    </p>
-                    <p className="mt-2 text-xs text-zinc-500">
-                      {classById.get(entry.classId)
-                        ? classLabel(classById.get(entry.classId) as SchoolClassSection)
-                        : "Unknown class"} /{" "}
-                      {DAY_LABELS[entry.dayOfWeek]} /{" "}
-                      {periods[entry.periodIndex]?.label || `Period ${entry.periodIndex + 1}`}
-                      {periods[entry.periodIndex]?.startTime && periods[entry.periodIndex]?.endTime
-                        ? ` (${periods[entry.periodIndex].startTime} - ${periods[entry.periodIndex].endTime})`
-                        : ""}
-                    </p>
-                  </div>
-                ))}
+                .map((entry) => {
+                  const effectivePeriod = getClassPeriod(entry.classId, entry.periodIndex);
+
+                  return (
+                    <div
+                      key={entry.id}
+                      className="rounded-[18px] border border-white/10 bg-black/20 p-4 text-sm text-zinc-300"
+                    >
+                      <p className="font-semibold text-white">
+                        {entry.subject || "Subject"} -{" "}
+                        {publicTeacherName(teacherById.get(entry.teacherId || ""))}
+                      </p>
+                      <p className="mt-2 text-xs text-zinc-500">
+                        {classById.get(entry.classId)
+                          ? classLabel(classById.get(entry.classId) as SchoolClassSection)
+                          : "Unknown class"} /{" "}
+                        {DAY_LABELS[entry.dayOfWeek]} /{" "}
+                        {effectivePeriod?.label || `Period ${entry.periodIndex + 1}`}
+                        {effectivePeriod?.startTime && effectivePeriod?.endTime
+                          ? ` (${effectivePeriod.startTime} - ${effectivePeriod.endTime})`
+                          : ""}
+                      </p>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>

@@ -9,12 +9,12 @@
       "updatedAt": "2026-04-22T18:40:13.625Z"
     },
     {
-      "id": "class-2f218d27-260a-406c-9889-4ea0c801242b",
-      "name": "EB1 B",
-      "gradeLevel": "Grade 1",
-      "displayLabel": "EB1 B",
-      "createdAt": "2026-04-22T18:54:03.905Z",
-      "updatedAt": "2026-04-22T18:54:03.905Z"
+      "id": "class-e094d517-f106-4a6c-b00b-c12bfabb92e7",
+      "name": "EB2C",
+      "gradeLevel": "grade 2",
+      "displayLabel": "EB2C",
+      "createdAt": "2026-04-23T15:38:34.260Z",
+      "updatedAt": "2026-04-23T15:38:34.260Z"
     }
   ],
   "teachers": [
@@ -115,6 +115,35 @@
       "updatedAt": "2026-04-22T18:53:14.628Z"
     }
   ],
+  "classPeriodOverrides": [
+    {
+      "id": "class-period-f652465b-8fca-4d05-9bbb-0d7b462d20cf",
+      "classId": "class-9ad68020-6643-45c2-9e10-e6dfc7b34e39",
+      "periodIndex": 0,
+      "startTime": "07:35 AM",
+      "endTime": "08:35",
+      "hidden": false,
+      "updatedAt": "2026-04-23T15:38:08.633Z"
+    },
+    {
+      "id": "class-period-99dc73e2-19e2-41b9-a67a-ffd74fa9d199",
+      "classId": "class-9ad68020-6643-45c2-9e10-e6dfc7b34e39",
+      "periodIndex": 5,
+      "startTime": "11:35",
+      "endTime": "12:25",
+      "hidden": true,
+      "updatedAt": "2026-04-23T15:38:08.865Z"
+    },
+    {
+      "id": "class-period-6e335cb5-f7d0-4083-add7-3572d832361b",
+      "classId": "class-9ad68020-6643-45c2-9e10-e6dfc7b34e39",
+      "periodIndex": 8,
+      "startTime": "13:45",
+      "endTime": "14:40",
+      "hidden": true,
+      "updatedAt": "2026-04-23T15:38:11.708Z"
+    }
+  ],
   "entries": [
     {
       "id": "entry-86169aca-70c2-4f01-93af-d2ae42bd794b",
@@ -125,17 +154,7 @@
       "subject": "Maths",
       "teacherId": "teacher-9fbcd582-126d-43e2-871e-73fc33703ffc",
       "updatedAt": "2026-04-22T18:53:31.182Z"
-    },
-    {
-      "id": "entry-2b1f4d61-863c-45f2-b7f4-5cf8d759120f",
-      "classId": "class-2f218d27-260a-406c-9889-4ea0c801242b",
-      "dayOfWeek": "monday",
-      "periodIndex": 1,
-      "type": "class",
-      "subject": "Maths",
-      "teacherId": "teacher-9fbcd582-126d-43e2-871e-73fc33703ffc",
-      "updatedAt": "2026-04-22T18:54:31.713Z"
     }
   ],
-  "updatedAt": "2026-04-22T18:54:40.446Z"
+  "updatedAt": "2026-04-23T15:38:36.809Z"
 }

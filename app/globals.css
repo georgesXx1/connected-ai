@@ -282,6 +282,23 @@ a {
   min-width: 0;
 }
 
+.schedule-admin-periods-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 0.25rem;
+}
+
+.schedule-admin-periods-rows {
+  display: grid;
+  gap: 1rem;
+  min-width: min-content;
+}
+
+.schedule-admin-period-card {
+  min-width: 980px;
+}
+
 .schedule-admin-edit-grid {
   display: grid;
   gap: 1rem;
@@ -298,17 +315,22 @@ a {
 .schedule-admin-edit-grid--period {
   grid-template-columns:
     minmax(160px, 1.2fr)
-    minmax(170px, 1fr)
-    minmax(170px, 1fr)
-    minmax(140px, 0.8fr);
+    minmax(230px, 1fr)
+    minmax(230px, 1fr)
+    minmax(140px, 0.8fr)
+    minmax(96px, auto);
 }
 
 .schedule-admin-delete-row {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   width: 100%;
-  grid-column: 1 / -1;
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  padding-left: 0.75rem;
+  background: linear-gradient(90deg, transparent, rgba(5, 8, 13, 0.94) 32%);
 }
 
 .schedule-time-input {
@@ -337,8 +359,7 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .schedule-admin-edit-grid--two,
-  .schedule-admin-edit-grid--period {
+  .schedule-admin-edit-grid--two {
     grid-template-columns: 1fr;
   }
 }

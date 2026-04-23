@@ -52,10 +52,21 @@ export type ScheduleEntry = {
   updatedAt: string;
 };
 
+export type ClassPeriodOverride = {
+  id: string;
+  classId: string;
+  periodIndex: number;
+  startTime: string;
+  endTime: string;
+  hidden: boolean;
+  updatedAt: string;
+};
+
 export type SchoolScheduleData = {
   classes: SchoolClassSection[];
   teachers: TeacherAccount[];
   periods: SchedulePeriod[];
+  classPeriodOverrides: ClassPeriodOverride[];
   entries: ScheduleEntry[];
   updatedAt: string;
 };
@@ -237,6 +248,27 @@ function normalizeScheduleEntry(value: unknown, index: number): ScheduleEntry | 
   };
 }
 
+function normalizeClassPeriodOverride(value: unknown, index: number): ClassPeriodOverride | null {
+  const item = value && typeof value === "object" ? (value as Partial<ClassPeriodOverride>) : {};
+  const timestamp = nowIso();
+  const classId = normalizeString(item.classId);
+  const periodIndex = Number(item.periodIndex);
+
+  if (!classId || !Number.isInteger(periodIndex) || periodIndex < 0) {
+    return null;
+  }
+
+  return {
+    id: normalizeString(item.id) || `class-period-${index + 1}`,
+    classId,
+    periodIndex,
+    startTime: normalizeString(item.startTime),
+    endTime: normalizeString(item.endTime),
+    hidden: Boolean(item.hidden),
+    updatedAt: normalizeString(item.updatedAt) || timestamp,
+  };
+}
+
 export function sanitizeSchoolScheduleData(value: unknown): SchoolScheduleData {
   const item = value && typeof value === "object" ? (value as Partial<SchoolScheduleData>) : {};
   const classes = Array.isArray(item.classes)
@@ -262,13 +294,34 @@ export function sanitizeSchoolScheduleData(value: unknown): SchoolScheduleData {
     : buildDefaultPeriods(Math.max(DEFAULT_PERIODS, highestEntryPeriod + 1));
   const knownClassIds = new Set(classes.map((classSection) => classSection.id));
   const knownTeacherIds = new Set(teachers.map((teacher) => teacher.id));
+  const classPeriodOverrides = new Map<string, ClassPeriodOverride>();
   const dedupedEntries = new Map<string, ScheduleEntry>();
+
+  if (Array.isArray(item.classPeriodOverrides)) {
+    item.classPeriodOverrides.forEach((rawOverride, index) => {
+      const override = normalizeClassPeriodOverride(rawOverride, index);
+
+      if (
+        !override ||
+        !knownClassIds.has(override.classId) ||
+        override.periodIndex >= periods.length
+      ) {
+        return;
+      }
+
+      classPeriodOverrides.set(`${override.classId}:${override.periodIndex}`, override);
+    });
+  }
 
   if (Array.isArray(item.entries)) {
     item.entries.forEach((rawEntry, index) => {
       const entry = normalizeScheduleEntry(rawEntry, index);
 
       if (!entry || !knownClassIds.has(entry.classId)) {
+        return;
+      }
+
+      if (classPeriodOverrides.get(`${entry.classId}:${entry.periodIndex}`)?.hidden) {
         return;
       }
 
@@ -290,6 +343,7 @@ export function sanitizeSchoolScheduleData(value: unknown): SchoolScheduleData {
     classes,
     teachers,
     periods,
+    classPeriodOverrides: [...classPeriodOverrides.values()],
     entries: [...dedupedEntries.values()],
     updatedAt: normalizeString(item.updatedAt) || nowIso(),
   };
@@ -393,12 +447,69 @@ export function getTeacherSchedule(
       ...entry,
       className: classNames.get(entry.classId) || "Unknown class",
       teacherName: teacher?.fullName || "Teacher",
-      periodLabel: data.periods[entry.periodIndex]?.label || `Period ${entry.periodIndex + 1}`,
-      startTime: data.periods[entry.periodIndex]?.startTime || "",
-      endTime: data.periods[entry.periodIndex]?.endTime || "",
+      periodLabel: getClassPeriodForClass(data, entry.classId, entry.periodIndex)?.label
+        || `Period ${entry.periodIndex + 1}`,
+      startTime: getClassPeriodForClass(data, entry.classId, entry.periodIndex)?.startTime || "",
+      endTime: getClassPeriodForClass(data, entry.classId, entry.periodIndex)?.endTime || "",
     }))
     .sort((left, right) => {
       const dayDelta = SCHEDULE_DAYS.indexOf(left.dayOfWeek) - SCHEDULE_DAYS.indexOf(right.dayOfWeek);
       return dayDelta || left.periodIndex - right.periodIndex;
     });
+}
+
+export function getClassPeriodOverride(
+  data: Pick<SchoolScheduleData, "classPeriodOverrides">,
+  classId: string,
+  periodIndex: number,
+) {
+  return data.classPeriodOverrides.find(
+    (override) => override.classId === classId && override.periodIndex === periodIndex,
+  );
+}
+
+export function getClassPeriodForClass(
+  data: Pick<SchoolScheduleData, "periods" | "classPeriodOverrides">,
+  classId: string,
+  periodIndex: number,
+) {
+  const period = data.periods[periodIndex];
+
+  if (!period) {
+    return null;
+  }
+
+  const override = getClassPeriodOverride(data, classId, periodIndex);
+
+  return {
+    ...period,
+    startTime: override ? override.startTime : period.startTime,
+    endTime: override ? override.endTime : period.endTime,
+    hidden: override?.hidden ?? false,
+  };
+}
+
+export function getVisibleClassPeriods(
+  data: Pick<SchoolScheduleData, "periods" | "classPeriodOverrides">,
+  classId: string,
+) {
+  return data.periods
+    .map((_, periodIndex) => ({
+      periodIndex,
+      period: getClassPeriodForClass(data, classId, periodIndex),
+    }))
+    .filter(
+      (
+        item,
+      ): item is {
+        periodIndex: number;
+        period: NonNullable<ReturnType<typeof getClassPeriodForClass>>;
+      } => {
+        if (!item.period) {
+          return false;
+        }
+
+        return !item.period.hidden;
+      },
+    );
 }

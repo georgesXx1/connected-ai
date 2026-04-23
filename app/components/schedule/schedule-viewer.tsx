@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 
 import type {
+  ClassPeriodOverride,
   ScheduleDay,
+  SchedulePeriod,
   SchoolScheduleData,
 } from "@/lib/school-schedule";
 
@@ -31,6 +33,30 @@ function classLabel(classSection: SchoolScheduleData["classes"][number]) {
   return classSection.displayLabel || classSection.name;
 }
 
+function getVisibleClassPeriods(
+  periods: SchedulePeriod[],
+  classPeriodOverrides: ClassPeriodOverride[],
+  classId: string,
+) {
+  return periods
+    .map((period, periodIndex) => {
+      const override = classPeriodOverrides.find(
+        (entry) => entry.classId === classId && entry.periodIndex === periodIndex,
+      );
+
+      return {
+        periodIndex,
+        period: {
+          ...period,
+          startTime: override ? override.startTime : period.startTime,
+          endTime: override ? override.endTime : period.endTime,
+          hidden: override?.hidden ?? false,
+        },
+      };
+    })
+    .filter((entry) => !entry.period.hidden);
+}
+
 export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
   const [selectedClassId, setSelectedClassId] = useState(
     schedule.classes[0]?.id || "",
@@ -41,6 +67,18 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
   const teacherById = useMemo(
     () => new Map(schedule.teachers.map((teacher) => [teacher.id, teacher])),
     [schedule.teachers],
+  );
+  const visiblePeriods = useMemo(
+    () => (
+      selectedClassId
+        ? getVisibleClassPeriods(
+            schedule.periods,
+            schedule.classPeriodOverrides,
+            selectedClassId,
+          )
+        : []
+    ),
+    [schedule, selectedClassId],
   );
 
   function getEntry(dayOfWeek: ScheduleDay, periodIndex: number) {
@@ -104,7 +142,7 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
                 </tr>
               </thead>
               <tbody>
-                {schedule.periods.map((period, periodIndex) => {
+                {visiblePeriods.map(({ period, periodIndex }) => {
                   const isRecessPeriod = period.type === "recess";
 
                   return (

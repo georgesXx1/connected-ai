@@ -613,6 +613,7 @@ function createFallbackSchoolSchedule(): SchoolScheduleData {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })),
+    classPeriodOverrides: [],
     entries: [],
     updatedAt: new Date().toISOString(),
   };
