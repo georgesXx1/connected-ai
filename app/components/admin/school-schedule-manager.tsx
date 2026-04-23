@@ -1473,7 +1473,7 @@ export default function SchoolScheduleManager({
       ) : null}
 
       {activeTab === "periods" ? (
-        <div className="schedule-admin-split schedule-admin-split--periods">
+        <div className="space-y-6">
           <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
               New period
