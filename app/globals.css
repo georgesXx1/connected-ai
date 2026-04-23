@@ -252,6 +252,85 @@ a {
   animation: gem-shimmer 1.9s ease-in-out infinite;
 }
 
+.schedule-admin,
+.schedule-admin * {
+  min-width: 0;
+}
+
+.schedule-admin-split {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.schedule-admin-list,
+.schedule-admin-card,
+.schedule-admin-control {
+  width: 100%;
+}
+
+.schedule-admin-edit-grid {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  justify-items: stretch;
+}
+
+.schedule-admin-delete-row {
+  display: flex;
+  justify-content: center;
+}
+
+.schedule-time-input {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.schedule-time-input-field {
+  width: 100%;
+  flex: 1 1 0;
+}
+
+.schedule-time-input-meridiem {
+  width: 5rem;
+  flex: 0 0 5rem;
+}
+
+@media (min-width: 64rem) {
+  .schedule-admin-edit-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .schedule-admin-edit-grid--period {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .schedule-admin-delete-row {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 80rem) {
+  .schedule-admin-split--classes,
+  .schedule-admin-split--periods {
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  }
+
+  .schedule-admin-split--teachers {
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  }
+
+  .schedule-admin-edit-grid--period {
+    grid-template-columns:
+      minmax(0, 1.2fr)
+      minmax(0, 0.8fr)
+      minmax(0, 0.8fr)
+      minmax(0, 0.9fr);
+  }
+}
+
 @keyframes gem-fade-up {
   from {
     opacity: 0;

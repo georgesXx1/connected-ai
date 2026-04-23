@@ -192,7 +192,7 @@ function PeriodTimeInput({
   }
 
   return (
-    <div className="flex min-w-0 gap-2">
+    <div className="schedule-time-input">
       <input
         type="text"
         inputMode="numeric"
@@ -200,12 +200,12 @@ function PeriodTimeInput({
         onChange={(event) => updateTime(event.target.value)}
         onBlur={normalizeOnBlur}
         placeholder="07:45"
-        className={`${className} min-w-0 flex-1`}
+        className={`${className} schedule-admin-control schedule-time-input-field`}
       />
       <select
         value={meridiem}
         onChange={(event) => updateTime(timeText, event.target.value as Meridiem)}
-        className="h-11 w-20 shrink-0 rounded-2xl border border-white/10 bg-[#0f1319] px-3 text-sm text-white outline-none"
+        className="schedule-time-input-meridiem h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-3 text-sm text-white outline-none"
       >
         <option value="AM">AM</option>
         <option value="PM">PM</option>
@@ -644,7 +644,7 @@ export default function SchoolScheduleManager({
   }
 
   return (
-    <div className="space-y-7">
+    <div className="schedule-admin space-y-7">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-[30px] border border-white/10 bg-white/[0.04] p-5">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
@@ -697,7 +697,7 @@ export default function SchoolScheduleManager({
       ) : null}
 
       {activeTab === "classes" ? (
-        <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+        <div className="schedule-admin-split schedule-admin-split--classes">
           <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
               New class section
@@ -743,7 +743,7 @@ export default function SchoolScheduleManager({
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="schedule-admin-list grid gap-4 md:grid-cols-2">
             {classes.length === 0 ? (
               <div className="rounded-[24px] border border-white/10 bg-black/20 p-5 text-sm text-zinc-400">
                 No class sections yet.
@@ -752,7 +752,7 @@ export default function SchoolScheduleManager({
               classes.map((classSection) => (
                 <div
                   key={classSection.id}
-                  className="rounded-[26px] border border-white/10 bg-black/20 p-5"
+                  className="schedule-admin-card rounded-[26px] border border-white/10 bg-black/20 p-5"
                 >
                   <div className="space-y-3">
                     <input
@@ -760,7 +760,7 @@ export default function SchoolScheduleManager({
                       onChange={(event) =>
                         updateClassSection(classSection.id, "name", event.target.value)
                       }
-                      className="h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
                     />
                     <input
                       value={classSection.gradeLevel}
@@ -771,7 +771,7 @@ export default function SchoolScheduleManager({
                           event.target.value,
                         )
                       }
-                      className="h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-zinc-200 outline-none"
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-zinc-200 outline-none"
                     />
                     <input
                       value={classSection.displayLabel || ""}
@@ -783,7 +783,7 @@ export default function SchoolScheduleManager({
                         )
                       }
                       placeholder="Display label"
-                      className="h-11 w-full rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-zinc-200 outline-none placeholder:text-zinc-600"
                     />
                   </div>
                   <button
@@ -801,7 +801,7 @@ export default function SchoolScheduleManager({
       ) : null}
 
       {activeTab === "teachers" ? (
-        <div className="grid gap-6 xl:grid-cols-[380px_minmax(0,1fr)]">
+        <div className="schedule-admin-split schedule-admin-split--teachers">
           <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
               New teacher account
@@ -885,7 +885,7 @@ export default function SchoolScheduleManager({
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="schedule-admin-list space-y-4">
             {teachers.length === 0 ? (
               <div className="rounded-[24px] border border-white/10 bg-black/20 p-5 text-sm text-zinc-400">
                 No teacher accounts yet.
@@ -894,22 +894,22 @@ export default function SchoolScheduleManager({
               teachers.map((teacher) => (
                 <div
                   key={teacher.id}
-                  className="rounded-[26px] border border-white/10 bg-black/20 p-5"
+                  className="schedule-admin-card rounded-[26px] border border-white/10 bg-black/20 p-5"
                 >
-                  <div className="grid gap-4 lg:grid-cols-2">
+                  <div className="schedule-admin-edit-grid schedule-admin-edit-grid--two">
                     <input
                       value={teacher.fullName}
                       onChange={(event) =>
                         updateTeacher(teacher.id, "fullName", event.target.value)
                       }
-                      className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
                     />
                     <input
                       value={teacher.username}
                       onChange={(event) =>
                         updateTeacher(teacher.id, "username", event.target.value)
                       }
-                      className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
                     />
                     <input
                       type="password"
@@ -918,14 +918,14 @@ export default function SchoolScheduleManager({
                         updateTeacher(teacher.id, "password", event.target.value)
                       }
                       placeholder="New password (leave blank to keep)"
-                      className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none placeholder:text-zinc-600"
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none placeholder:text-zinc-600"
                     />
                     <select
                       value={teacher.status}
                       onChange={(event) =>
                         updateTeacher(teacher.id, "status", event.target.value)
                       }
-                      className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                      className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
@@ -978,7 +978,7 @@ export default function SchoolScheduleManager({
       ) : null}
 
       {activeTab === "periods" ? (
-        <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+        <div className="schedule-admin-split schedule-admin-split--periods">
           <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-7">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
               New period
@@ -1046,19 +1046,19 @@ export default function SchoolScheduleManager({
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="schedule-admin-list space-y-4">
             {visiblePeriods.map((period, index) => (
               <div
                 key={period.id}
-                className="rounded-[26px] border border-white/10 bg-black/20 p-5"
+                className="schedule-admin-card rounded-[26px] border border-white/10 bg-black/20 p-5"
               >
-                <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.9fr)]">
+                <div className="schedule-admin-edit-grid schedule-admin-edit-grid--period">
                   <input
                     value={period.label}
                     onChange={(event) =>
                       updatePeriod(index, "label", event.target.value)
                     }
-                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm font-semibold text-white outline-none"
+                    className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm font-semibold text-white outline-none"
                   />
                   <PeriodTimeInput
                     value={period.startTime}
@@ -1068,7 +1068,7 @@ export default function SchoolScheduleManager({
                     onInvalid={() =>
                       setError(`${period.label || "This period"} has an invalid start time. Use 12-hour format like 07:45 AM.`)
                     }
-                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
                   />
                   <PeriodTimeInput
                     value={period.endTime}
@@ -1078,19 +1078,19 @@ export default function SchoolScheduleManager({
                     onInvalid={() =>
                       setError(`${period.label || "This period"} has an invalid end time. Use 12-hour format like 08:35 AM.`)
                     }
-                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                    className="h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
                   />
                   <select
                     value={period.type}
                     onChange={(event) =>
                       updatePeriod(index, "type", event.target.value)
                     }
-                    className="h-11 min-w-0 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-sm text-white outline-none"
+                    className="schedule-admin-control h-11 rounded-2xl border border-white/10 bg-[#0f1319] px-4 text-center text-sm text-white outline-none"
                   >
                     <option value="class">Class</option>
                     <option value="recess">Recess</option>
                   </select>
-                  <div className="lg:col-span-2 xl:col-span-4">
+                  <div className="schedule-admin-delete-row">
                     <button
                       type="button"
                       onClick={() => deletePeriod(index)}
