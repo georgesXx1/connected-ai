@@ -150,7 +150,7 @@ const translations = {
         href: "/tuition",
       },
       {
-        title: "School Schedule",
+        title: "Emploi du temps",
         description:
           "Consultez les emplois du temps par classe avec horaires, matieres, enseignants et recreations.",
         href: "/schedule",
@@ -213,9 +213,9 @@ const translations = {
         href: "/tuition",
       },
       {
-        title: "School Schedule",
+        title: "الجدول المدرسي",
         description:
-          "View class timetables with period times, subjects, teachers, and recess.",
+          "اطّلع على جداول الصفوف الأسبوعية مع أوقات الحصص، والمواد، والمعلمين، وفترات الاستراحة.",
         href: "/schedule",
       },
     ],

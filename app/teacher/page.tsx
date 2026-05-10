@@ -65,6 +65,109 @@ const DAY_LABELS: Record<ScheduleDay, string> = {
   friday: "Friday",
 };
 
+const LOCALIZED_DAY_LABELS: Record<Language, Record<ScheduleDay, string>> = {
+  en: DAY_LABELS,
+  fr: {
+    monday: "Lundi",
+    tuesday: "Mardi",
+    wednesday: "Mercredi",
+    thursday: "Jeudi",
+    friday: "Vendredi",
+  },
+  ar: {
+    monday: "الاثنين",
+    tuesday: "الثلاثاء",
+    wednesday: "الأربعاء",
+    thursday: "الخميس",
+    friday: "الجمعة",
+  },
+};
+
+const SCHEDULE_TEXT: Record<
+  Language,
+  {
+    loading: string;
+    teacherAccount: string;
+    logout: string;
+    mySchedule: string;
+    noSchedule: string;
+    day: string;
+    period: string;
+    class: string;
+    subject: string;
+    signInEyebrow: string;
+    signInTitle: string;
+    signInDescription: string;
+    username: string;
+    password: string;
+    signIn: string;
+    signingIn: string;
+    loginError: string;
+  }
+> = {
+  en: {
+    loading: "Loading teacher schedule...",
+    teacherAccount: "Teacher account",
+    logout: "Log out",
+    mySchedule: "My Schedule",
+    noSchedule: "No schedule entries have been assigned to this teacher yet.",
+    day: "Day",
+    period: "Period",
+    class: "Class",
+    subject: "Subject",
+    signInEyebrow: "Teacher sign in",
+    signInTitle: "Open your schedule",
+    signInDescription:
+      "Use the username and password created by Administration.",
+    username: "Username",
+    password: "Password",
+    signIn: "Sign in",
+    signingIn: "Signing in...",
+    loginError: "The username or password is incorrect.",
+  },
+  fr: {
+    loading: "Chargement de l'emploi du temps...",
+    teacherAccount: "Compte enseignant",
+    logout: "Se deconnecter",
+    mySchedule: "Mon emploi du temps",
+    noSchedule:
+      "Aucun cours n'a encore ete attribue a cet enseignant.",
+    day: "Jour",
+    period: "Periode",
+    class: "Classe",
+    subject: "Matiere",
+    signInEyebrow: "Connexion enseignant",
+    signInTitle: "Ouvrir mon emploi du temps",
+    signInDescription:
+      "Utilisez le nom d'utilisateur et le mot de passe crees par l'administration.",
+    username: "Nom d'utilisateur",
+    password: "Mot de passe",
+    signIn: "Se connecter",
+    signingIn: "Connexion...",
+    loginError: "Le nom d'utilisateur ou le mot de passe est incorrect.",
+  },
+  ar: {
+    loading: "جاري تحميل جدول المعلم...",
+    teacherAccount: "حساب المعلم",
+    logout: "تسجيل الخروج",
+    mySchedule: "جدولي الأسبوعي",
+    noSchedule: "لم يتم تعيين أي حصص لهذا المعلم حتى الآن.",
+    day: "اليوم",
+    period: "الحصة",
+    class: "الصف",
+    subject: "المادة",
+    signInEyebrow: "تسجيل دخول المعلم",
+    signInTitle: "افتح جدولك",
+    signInDescription:
+      "استخدم اسم المستخدم وكلمة المرور اللذين أنشأتهما الإدارة.",
+    username: "اسم المستخدم",
+    password: "كلمة المرور",
+    signIn: "تسجيل الدخول",
+    signingIn: "جاري تسجيل الدخول...",
+    loginError: "اسم المستخدم أو كلمة المرور غير صحيح.",
+  },
+};
+
 const TRANSLATIONS: Record<Language, TranslationSet> = {
   en: {
     portalTitle: "Teacher Portal",
@@ -180,10 +283,10 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         icon: "N",
       },
       teacher_schedule: {
-        label: "My Schedule",
-        shortLabel: "Schedule",
+        label: "Mon emploi du temps",
+        shortLabel: "Emploi du temps",
         eyebrow: "Emploi du temps enseignant",
-        title: "My weekly schedule",
+        title: "Mon emploi du temps hebdomadaire",
         description:
           "Connectez-vous avec le compte cree par l'administration pour consulter vos cours.",
         placeholder: "",
@@ -240,6 +343,17 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
           "اقترح تعديلًا عادلًا لهذه الدرجات.",
         ],
         icon: "د",
+      },
+      teacher_schedule: {
+        label: "جدولي",
+        shortLabel: "الجدول",
+        eyebrow: "جدول المعلم",
+        title: "جدولي الأسبوعي",
+        description:
+          "سجّل الدخول باستخدام حساب المعلم الذي أنشأته الإدارة لعرض الحصص المخصصة لك.",
+        placeholder: "",
+        suggestions: [],
+        icon: "ج",
       },
     },
   },
@@ -362,6 +476,8 @@ function TeacherPageContent() {
   }, [language]);
 
   const translation = TRANSLATIONS[language];
+  const scheduleText = SCHEDULE_TEXT[language];
+  const dayLabels = LOCALIZED_DAY_LABELS[language];
   const currentConfig = getModeConfig(translation, activeMode);
   const activeMessages = chats[activeMode];
   const hasMessages = activeMessages.length > 0;
@@ -430,7 +546,7 @@ function TeacherPageContent() {
       const payload = await response.json().catch(() => null);
 
       if (!response.ok || !payload?.teacher) {
-        throw new Error("The username or password is incorrect.");
+        throw new Error(scheduleText.loginError);
       }
 
       const scheduleResponse = await fetch("/api/teacher/me");
@@ -445,7 +561,7 @@ function TeacherPageContent() {
       setTeacherLoginError(
         loginError instanceof Error
           ? loginError.message
-          : "The username or password is incorrect.",
+          : scheduleText.loginError,
       );
     } finally {
       setIsTeacherSigningIn(false);
@@ -759,14 +875,14 @@ function TeacherPageContent() {
                   <div className={`${textAlignClass}`} dir={textDirection}>
                     {isTeacherSessionLoading ? (
                       <div className="gem-panel rounded-[30px] p-7 text-sm text-slate-500">
-                        Loading teacher schedule...
+                        {scheduleText.loading}
                       </div>
                     ) : teacherAccount ? (
                       <div className="space-y-6">
                         <div className="gem-panel rounded-[30px] p-7">
                           <div className="flex flex-wrap items-start justify-between gap-4">
                             <div>
-                              <p className="gem-eyebrow">Teacher account</p>
+                              <p className="gem-eyebrow">{scheduleText.teacherAccount}</p>
                               <h3 className="mt-3 text-2xl font-black text-slate-950">
                                 {teacherAccount.fullName}
                               </h3>
@@ -779,18 +895,18 @@ function TeacherPageContent() {
                               onClick={handleTeacherLogout}
                               className="gem-soft-button inline-flex h-10 items-center justify-center rounded-2xl px-4 text-sm font-semibold"
                             >
-                              Log out
+                              {scheduleText.logout}
                             </button>
                           </div>
                         </div>
 
                         <div className="gem-panel overflow-hidden rounded-[30px]">
                           <div className="border-b border-blue-900/10 px-6 py-5">
-                            <p className="gem-eyebrow">My Schedule</p>
+                            <p className="gem-eyebrow">{scheduleText.mySchedule}</p>
                           </div>
                           {teacherSchedule.length === 0 ? (
                             <div className="p-6 text-sm leading-7 text-slate-500">
-                              No schedule entries have been assigned to this teacher yet.
+                              {scheduleText.noSchedule}
                             </div>
                           ) : (
                             <div className="overflow-x-auto">
@@ -798,16 +914,16 @@ function TeacherPageContent() {
                                 <thead>
                                   <tr className="border-b border-blue-900/10 bg-white/50">
                                     <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
-                                      Day
+                                      {scheduleText.day}
                                     </th>
                                     <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
-                                      Period
+                                      {scheduleText.period}
                                     </th>
                                     <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
-                                      Class
+                                      {scheduleText.class}
                                     </th>
                                     <th className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
-                                      Subject
+                                      {scheduleText.subject}
                                     </th>
                                   </tr>
                                 </thead>
@@ -818,7 +934,7 @@ function TeacherPageContent() {
                                       className="border-b border-blue-900/10 last:border-b-0"
                                     >
                                       <td className="px-5 py-4 text-sm font-semibold text-slate-950">
-                                        {DAY_LABELS[entry.dayOfWeek]}
+                                        {dayLabels[entry.dayOfWeek]}
                                       </td>
                                       <td className="px-5 py-4 text-sm text-slate-600">
                                         <span className="font-semibold text-slate-800">
@@ -849,12 +965,12 @@ function TeacherPageContent() {
                         onSubmit={handleTeacherLogin}
                         className="gem-panel mx-auto max-w-xl rounded-[30px] p-7"
                       >
-                        <p className="gem-eyebrow">Teacher sign in</p>
+                        <p className="gem-eyebrow">{scheduleText.signInEyebrow}</p>
                         <h3 className="mt-3 text-2xl font-black text-slate-950">
-                          Open your schedule
+                          {scheduleText.signInTitle}
                         </h3>
                         <p className="mt-3 text-sm leading-7 text-slate-500">
-                          Use the username and password created by Administration.
+                          {scheduleText.signInDescription}
                         </p>
                         <div className="mt-6 space-y-4">
                           <input
@@ -865,7 +981,7 @@ function TeacherPageContent() {
                                 username: event.target.value,
                               }))
                             }
-                            placeholder="Username"
+                            placeholder={scheduleText.username}
                             className="gem-input h-12 w-full rounded-2xl px-4 text-sm outline-none"
                           />
                           <input
@@ -877,7 +993,7 @@ function TeacherPageContent() {
                                 password: event.target.value,
                               }))
                             }
-                            placeholder="Password"
+                            placeholder={scheduleText.password}
                             className="gem-input h-12 w-full rounded-2xl px-4 text-sm outline-none"
                           />
                           {teacherLoginError ? (
@@ -890,7 +1006,7 @@ function TeacherPageContent() {
                             disabled={isTeacherSigningIn}
                             className="gem-button inline-flex h-12 w-full items-center justify-center rounded-2xl text-sm font-bold disabled:opacity-60"
                           >
-                            {isTeacherSigningIn ? "Signing in..." : "Sign in"}
+                            {isTeacherSigningIn ? scheduleText.signingIn : scheduleText.signIn}
                           </button>
                         </div>
                       </form>

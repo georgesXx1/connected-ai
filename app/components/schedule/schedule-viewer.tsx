@@ -11,7 +11,10 @@ import type {
 
 type ScheduleViewerProps = {
   schedule: SchoolScheduleData;
+  language: Language;
 };
+
+type Language = "en" | "fr" | "ar";
 
 const SCHEDULE_DAYS: ScheduleDay[] = [
   "monday",
@@ -27,6 +30,75 @@ const DAY_LABELS: Record<ScheduleDay, string> = {
   wednesday: "Wednesday",
   thursday: "Thursday",
   friday: "Friday",
+};
+
+const TRANSLATIONS: Record<
+  Language,
+  {
+    chooseClass: string;
+    noClasses: string;
+    weeklyTimetable: string;
+    time: string;
+    timeNotSet: string;
+    recess: string;
+    subject: string;
+    teacherNotAssigned: string;
+    empty: string;
+    noSchedules: string;
+    days: Record<ScheduleDay, string>;
+  }
+> = {
+  en: {
+    chooseClass: "Choose class",
+    noClasses: "No classes available",
+    weeklyTimetable: "Weekly timetable",
+    time: "Time",
+    timeNotSet: "Time not set",
+    recess: "Recess",
+    subject: "Subject",
+    teacherNotAssigned: "Teacher not assigned",
+    empty: "Empty",
+    noSchedules: "No class schedules have been published yet.",
+    days: DAY_LABELS,
+  },
+  fr: {
+    chooseClass: "Choisir une classe",
+    noClasses: "Aucune classe disponible",
+    weeklyTimetable: "Emploi du temps hebdomadaire",
+    time: "Horaire",
+    timeNotSet: "Horaire non defini",
+    recess: "Recreation",
+    subject: "Matiere",
+    teacherNotAssigned: "Aucun enseignant attribue",
+    empty: "Vide",
+    noSchedules: "Aucun emploi du temps n'a encore ete publie.",
+    days: {
+      monday: "Lundi",
+      tuesday: "Mardi",
+      wednesday: "Mercredi",
+      thursday: "Jeudi",
+      friday: "Vendredi",
+    },
+  },
+  ar: {
+    chooseClass: "اختر الصف",
+    noClasses: "لا توجد صفوف متاحة",
+    weeklyTimetable: "الجدول الأسبوعي",
+    time: "الوقت",
+    timeNotSet: "لم يتم تحديد الوقت",
+    recess: "استراحة",
+    subject: "المادة",
+    teacherNotAssigned: "لم يتم تعيين معلم",
+    empty: "فارغ",
+    noSchedules: "لم يتم نشر أي جداول صفوف حتى الآن.",
+    days: {
+      monday: "الاثنين",
+      tuesday: "الثلاثاء",
+      wednesday: "الأربعاء",
+      thursday: "الخميس",
+      friday: "الجمعة",
+    },
+  },
 };
 
 function classLabel(classSection: SchoolScheduleData["classes"][number]) {
@@ -57,7 +129,10 @@ function getVisibleClassPeriods(
     .filter((entry) => !entry.period.hidden);
 }
 
-export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
+export default function ScheduleViewer({ schedule, language }: ScheduleViewerProps) {
+  const translation = TRANSLATIONS[language];
+  const textDirection = language === "ar" ? "rtl" : "ltr";
+  const textAlignClass = language === "ar" ? "text-right" : "text-left";
   const [selectedClassId, setSelectedClassId] = useState(
     schedule.classes[0]?.id || "",
   );
@@ -91,17 +166,17 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${textAlignClass}`} dir={textDirection}>
       <div className="gem-panel rounded-[30px] p-6 sm:p-7">
         <label className="block max-w-md">
-          <span className="gem-eyebrow">Choose class</span>
+          <span className="gem-eyebrow">{translation.chooseClass}</span>
           <select
             value={selectedClassId}
             onChange={(event) => setSelectedClassId(event.target.value)}
             className="gem-input mt-4 h-12 w-full rounded-2xl px-4 text-sm font-semibold outline-none"
           >
             {schedule.classes.length === 0 ? (
-              <option value="">No classes available</option>
+              <option value="">{translation.noClasses}</option>
             ) : null}
             {schedule.classes.map((classSection) => (
               <option key={classSection.id} value={classSection.id}>
@@ -115,7 +190,7 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
       {selectedClass ? (
         <div className="gem-panel overflow-hidden rounded-[30px]">
           <div className="border-b border-blue-900/10 px-6 py-5">
-            <p className="gem-eyebrow">Weekly timetable</p>
+            <p className="gem-eyebrow">{translation.weeklyTimetable}</p>
             <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
               {classLabel(selectedClass)}
             </h2>
@@ -129,14 +204,14 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
               <thead>
                 <tr className="border-b border-blue-900/10 bg-white/55">
                   <th className="w-48 px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
-                    Time
+                    {translation.time}
                   </th>
                   {SCHEDULE_DAYS.map((day) => (
                     <th
                       key={day}
                       className="px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] text-blue-700"
                     >
-                      {DAY_LABELS[day]}
+                      {translation.days[day]}
                     </th>
                   ))}
                 </tr>
@@ -159,7 +234,7 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
                         <p className="mt-1 text-xs font-semibold text-slate-500">
                           {period.startTime && period.endTime
                             ? `${period.startTime} - ${period.endTime}`
-                            : "Time not set"}
+                            : translation.timeNotSet}
                         </p>
                       </td>
                       {SCHEDULE_DAYS.map((day) => {
@@ -174,7 +249,7 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
                             {isRecess ? (
                               <div className="rounded-2xl border border-cyan-200/70 bg-cyan-50 px-4 py-3">
                                 <p className="text-sm font-black text-blue-950">
-                                  Recess
+                                  {translation.recess}
                                 </p>
                                 <p className="mt-1 text-xs font-semibold text-blue-700">
                                   {period.startTime && period.endTime
@@ -185,15 +260,15 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
                             ) : entry ? (
                               <div className="rounded-2xl border border-blue-900/10 bg-white/80 px-4 py-3">
                                 <p className="text-sm font-black text-slate-950">
-                                  {entry.subject || "Subject"}
+                                  {entry.subject || translation.subject}
                                 </p>
                                 <p className="mt-1 text-xs font-semibold text-slate-500">
-                                  {teacher?.fullName || "Teacher not assigned"}
+                                  {teacher?.fullName || translation.teacherNotAssigned}
                                 </p>
                               </div>
                             ) : (
                               <div className="rounded-2xl border border-dashed border-blue-900/10 bg-white/40 px-4 py-3 text-sm text-slate-400">
-                                Empty
+                                {translation.empty}
                               </div>
                             )}
                           </td>
@@ -208,7 +283,7 @@ export default function ScheduleViewer({ schedule }: ScheduleViewerProps) {
         </div>
       ) : (
         <div className="gem-panel rounded-[30px] p-7 text-sm leading-7 text-slate-500">
-          No class schedules have been published yet.
+          {translation.noSchedules}
         </div>
       )}
     </div>
