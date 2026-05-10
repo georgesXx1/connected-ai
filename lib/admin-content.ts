@@ -236,9 +236,9 @@ function buildDefaultPublicInfo(): AdminPublicInfo {
         ar: "معلومات التواصل",
       },
       {
-        en: "Phone: +961 09 945 190\nEmail: rosairejbeilofficial@gmail.com\nLocation: Blat, Jbeil District, Mount Lebanon, Lebanon.",
-        fr: "Telephone : +961 09 945 190\nE-mail : rosairejbeilofficial@gmail.com\nLieu : Blat, district de Jbeil, Mont-Liban, Liban.",
-        ar: "الهاتف: +961 09 945 190\nالبريد الالكتروني: rosairejbeilofficial@gmail.com\nالموقع: بلاط، قضاء جبيل، جبل لبنان، لبنان.",
+        en: "Phone: +961 09 945 190\nEmail: cs.jbeil@rosaire.edu.lb\nLocation: Blat, Jbeil District, Mount Lebanon, Lebanon.",
+        fr: "Telephone : +961 09 945 190\nE-mail : cs.jbeil@rosaire.edu.lb\nLieu : Blat, district de Jbeil, Mont-Liban, Liban.",
+        ar: "الهاتف: +961 09 945 190\nالبريد الالكتروني: cs.jbeil@rosaire.edu.lb\nالموقع: بلاط، قضاء جبيل، جبل لبنان، لبنان.",
       },
     ),
     officeHours: createPublicInfoEntry(

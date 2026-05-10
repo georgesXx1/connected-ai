@@ -610,11 +610,11 @@ export default function HomePage({ searchParams }: HomePageProps) {
                         {t.email}
                       </p>
                       <a
-                        href="mailto:rosairejbeilofficial@gmail.com"
+                        href="mailto:cs.jbeil@rosaire.edu.lb"
                         dir="ltr"
                         className={`mt-2 block text-sm font-semibold leading-6 text-slate-700 transition hover:text-blue-700 ${arabicContactClass}`}
                       >
-                        rosairejbeilofficial@gmail.com
+                        cs.jbeil@rosaire.edu.lb
                       </a>
                     </div>
                   </div>
