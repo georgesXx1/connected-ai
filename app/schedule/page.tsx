@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import ScheduleViewer from "@/app/components/schedule/schedule-viewer";
@@ -27,7 +26,7 @@ const TRANSLATIONS: Record<
 > = {
   en: {
     navTitle: "School Schedule",
-    back: "Back to GEMAI",
+    back: "Back to connected AI",
     eyebrow: "School Schedule",
     title: "Class weekly timetables",
     description:
@@ -35,7 +34,7 @@ const TRANSLATIONS: Record<
   },
   fr: {
     navTitle: "Emploi du temps",
-    back: "Retour a GEMAI",
+    back: "Retour a connected AI",
     eyebrow: "Emploi du temps",
     title: "Emplois du temps hebdomadaires",
     description:
@@ -43,7 +42,7 @@ const TRANSLATIONS: Record<
   },
   ar: {
     navTitle: "الجدول المدرسي",
-    back: "العودة إلى GEMAI",
+    back: "العودة إلى connected AI",
     eyebrow: "الجدول المدرسي",
     title: "جداول الصفوف الأسبوعية",
     description:
@@ -75,18 +74,8 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
             href={{ pathname: "/", query: { lang: language } }}
             className="flex min-w-0 items-center gap-3"
           >
-            <span className="gem-logo-mark flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/80 p-2">
-              <Image
-                src="/school-logo.png"
-                alt=""
-                width={36}
-                height={36}
-                className="object-contain"
-                priority
-              />
-            </span>
             <span className={`min-w-0 ${textAlignClass}`} dir={textDirection}>
-              <span className="gem-eyebrow block">GEMAI</span>
+              <span className="gem-eyebrow block">connected AI</span>
               <span className="mt-1 block truncate text-sm font-semibold text-slate-900">
                 {translation.navTitle}
               </span>
@@ -103,14 +92,6 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
         </nav>
 
         <section className="gem-shell relative mt-5 overflow-hidden rounded-[32px] px-6 py-10 sm:px-10 lg:px-14">
-          <Image
-            src="/school-logo.png"
-            alt=""
-            width={420}
-            height={420}
-            className="gem-watermark absolute -right-20 top-12 hidden object-contain lg:block"
-            aria-hidden="true"
-          />
           <div className={`relative ${textAlignClass}`} dir={textDirection}>
             <p className="gem-eyebrow">{translation.eyebrow}</p>
             <h1 className="mt-4 max-w-3xl text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
+import PublicHomeLink from "@/components/public-home-link";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GEMAI",
-  description: "School AI assistant for students, teachers, administration, and guests.",
+  title: "connected AI",
+  description: "School assistant for 1ere Ecole Officielle - Jbeil.",
 };
 
 export default function RootLayout({
@@ -28,7 +29,10 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${geistMono.variable} antialiased`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <PublicHomeLink />
+      </body>
     </html>
   );
 }

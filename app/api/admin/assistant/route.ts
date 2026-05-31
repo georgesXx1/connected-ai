@@ -863,7 +863,7 @@ ${sourceText}
           existingRuleText,
           kind,
           fallbackTitle,
-          "The AI provider is temporarily quota-limited, so GEMAI generated a formal Arabic draft locally to avoid blocking the Rules Manager.",
+          "The AI provider is temporarily quota-limited, so connected AI generated a formal Arabic draft locally to avoid blocking the Rules Manager.",
         ),
       );
     }

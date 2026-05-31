@@ -140,7 +140,7 @@ export async function POST(request: Request) {
   revalidatePath("/", "page");
   revalidatePath("/administration", "page");
   revalidatePath("/guest", "page");
-  revalidatePath("/tuition", "page");
+  revalidatePath("/registration", "page");
 
   return NextResponse.json({
     publicInfo: content.publicInfo,

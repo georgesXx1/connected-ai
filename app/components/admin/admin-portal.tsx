@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import SchoolScheduleManager from "@/app/components/admin/school-schedule-manager";
 import type {
@@ -190,12 +189,12 @@ const CATEGORY_SUGGESTIONS = [
 
 const TRANSLATIONS: Record<Language, TranslationSet> = {
   en: {
-    portalSubtitle: "Official GEMAI content control",
+    portalSubtitle: "Official connected AI content control",
     adminLabel: "Admin",
-    back: "Back to GEMAI",
+    back: "Back to connected AI",
     loginTitle: "Administrator Sign In",
     loginDescription:
-      "Use the school administration credentials to open the protected GEMAI administration portal.",
+      "Use the school administration credentials to open the protected connected AI administration portal.",
     username: "Username",
     password: "Password",
     signIn: "Sign in",
@@ -227,7 +226,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       modeEdit: "Edit Rule",
       modeTrash: "Trash",
       addDescription:
-        "Describe a rule naturally. GEMAI will review the request, draft the official Arabic wording, and ask if you want to add it.",
+        "Describe a rule naturally. connected AI will review the request, draft the official Arabic wording, and ask if you want to add it.",
       addPlaceholder:
         "Example: Add a rule that students must wear black shoes every school day.",
       addSend: "Send",
@@ -297,7 +296,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       preview: "Preview",
       confirmTitle: "Confirm public information changes",
       confirmBody:
-        "These updates will become the official public information used by GEMAI Guest.",
+        "These updates will become the official public information used by connected AI Guest.",
       confirm: "Confirm",
       editAgain: "Edit again",
       cancel: "Cancel",
@@ -334,12 +333,12 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
     },
   },
   fr: {
-    portalSubtitle: "Controle officiel du contenu GEMAI",
+    portalSubtitle: "Controle officiel du contenu connected AI",
     adminLabel: "Admin",
-    back: "Retour a GEMAI",
+    back: "Retour a connected AI",
     loginTitle: "Connexion administrateur",
     loginDescription:
-      "Utilisez les identifiants de l'administration scolaire pour ouvrir le portail d'administration protege de GEMAI.",
+      "Utilisez les identifiants de l'administration scolaire pour ouvrir le portail d'administration protege de connected AI.",
     username: "Nom d'utilisateur",
     password: "Mot de passe",
     signIn: "Se connecter",
@@ -371,7 +370,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       modeEdit: "Modifier",
       modeTrash: "Corbeille",
       addDescription:
-        "Decrivez une regle naturellement. GEMAI relira la demande, redigera la formulation arabe officielle et vous demandera si vous souhaitez l'ajouter.",
+        "Decrivez une regle naturellement. connected AI relira la demande, redigera la formulation arabe officielle et vous demandera si vous souhaitez l'ajouter.",
       addPlaceholder:
         "Exemple : ajoute une regle indiquant que les eleves doivent porter des chaussures noires chaque jour d'ecole.",
       addSend: "Envoyer",
@@ -441,7 +440,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       preview: "Apercu",
       confirmTitle: "Confirmer les informations publiques",
       confirmBody:
-        "Ces modifications deviendront les informations publiques officielles utilisees par GEMAI Guest.",
+        "Ces modifications deviendront les informations publiques officielles utilisees par connected AI Guest.",
       confirm: "Confirmer",
       editAgain: "Modifier encore",
       cancel: "Annuler",
@@ -478,12 +477,12 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
     },
   },
   ar: {
-    portalSubtitle: "التحكم الرسمي بالمحتوى في GEMAI",
+    portalSubtitle: "التحكم الرسمي بالمحتوى في connected AI",
     adminLabel: "Admin",
-    back: "العودة إلى GEMAI",
+    back: "العودة إلى connected AI",
     loginTitle: "تسجيل دخول الإدارة",
     loginDescription:
-      "استخدم بيانات اعتماد الإدارة المدرسية لفتح بوابة GEMAI الإدارية المحمية.",
+      "استخدم بيانات اعتماد الإدارة المدرسية لفتح بوابة connected AI الإدارية المحمية.",
     username: "اسم المستخدم",
     password: "كلمة المرور",
     signIn: "تسجيل الدخول",
@@ -511,7 +510,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       title: "إدارة القوانين",
       addTitle: "إضافة القوانين",
       addDescription:
-        "اكتب القانون بشكل طبيعي. سيقوم GEMAI بمراجعة الطلب وصياغة النص العربي الرسمي ثم يسألك إن كنت تريد إضافته.",
+        "اكتب القانون بشكل طبيعي. سيقوم connected AI بمراجعة الطلب وصياغة النص العربي الرسمي ثم يسألك إن كنت تريد إضافته.",
       addPlaceholder:
         "مثال: أضف قانونًا ينص على أن يرتدي الطلاب أحذية سوداء كل يوم دراسي.",
       addSend: "إرسال",
@@ -579,7 +578,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
       preview: "معاينة",
       confirmTitle: "تأكيد تغييرات المعلومات العامة",
       confirmBody:
-        "ستصبح هذه التعديلات المعلومات العامة الرسمية التي يستخدمها GEMAI للزائر.",
+        "ستصبح هذه التعديلات المعلومات العامة الرسمية التي يستخدمها connected AI للزائر.",
       confirm: "تأكيد",
       editAgain: "تعديل من جديد",
       cancel: "إلغاء",
@@ -686,49 +685,7 @@ function createFallbackPublicInfo(): AdminPublicInfo {
 }
 
 function createFallbackGradeInfo(): GradePublicInfo[] {
-  const now = new Date().toISOString();
-  const seeds: Array<{ id: string; className: string; ageRange?: string }> = [
-    { id: "kg1", className: "Kindergarten 1", ageRange: "ages 3-4" },
-    { id: "kg2", className: "Kindergarten 2", ageRange: "ages 4-5" },
-    { id: "kg3", className: "Kindergarten 3", ageRange: "ages 5-6" },
-    { id: "grade-1", className: "Grade 1", ageRange: "ages 6-7" },
-    { id: "grade-2", className: "Grade 2", ageRange: "ages 7-8" },
-    { id: "grade-3", className: "Grade 3", ageRange: "ages 8-9" },
-    { id: "grade-4", className: "Grade 4", ageRange: "ages 9-10" },
-    { id: "grade-5", className: "Grade 5", ageRange: "ages 10-11" },
-    { id: "grade-6", className: "Grade 6", ageRange: "ages 11-12" },
-    { id: "grade-7", className: "Grade 7", ageRange: "ages 12-13" },
-    { id: "grade-8", className: "Grade 8", ageRange: "ages 13-14" },
-    { id: "grade-9", className: "Grade 9", ageRange: "ages 14-15" },
-    { id: "grade-10", className: "Grade 10", ageRange: "ages 15-16" },
-    { id: "grade-11", className: "Grade 11", ageRange: "ages 16-17" },
-    { id: "grade-12", className: "Grade 12", ageRange: "ages 17-18" },
-  ];
-
-  return seeds.map((grade, index) => ({
-    ...grade,
-    tuitionAmount: String(1800 + index * 120),
-    tuitionCurrency: "USD",
-    stationeryAmount: String(90 + index * 8),
-    stationeryCurrency: "USD",
-    books: [
-      {
-        id: `${grade.id}-book-1`,
-        name: `${grade.className} Arabic Reader`,
-        status: "active",
-        createdAt: now,
-        updatedAt: now,
-      },
-      {
-        id: `${grade.id}-book-2`,
-        name: `${grade.className} Mathematics Workbook`,
-        status: "active",
-        createdAt: now,
-        updatedAt: now,
-      },
-    ],
-    updatedAt: now,
-  }));
+  return [];
 }
 
 function formatTimestamp(value: string, language: Language) {
@@ -851,6 +808,7 @@ export default function AdminPortal({
   const [rulesSuccess, setRulesSuccess] = useState("");
   const [rulesError, setRulesError] = useState("");
   const [isSavingRule, setIsSavingRule] = useState(false);
+  const [rulesPdfStatus, setRulesPdfStatus] = useState("");
 
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -1058,6 +1016,43 @@ export default function AdminPortal({
           }
         : current,
     );
+  }
+
+  async function handleRulesPdfUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setRulesPdfStatus("Reading PDF with the configured AI key...");
+    setRulesError("");
+
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("language", language);
+
+      const response = await fetch("/api/admin/rules/pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { extractedText?: string; message?: string; error?: string }
+        | null;
+
+      if (!response.ok || !payload?.extractedText) {
+        throw new Error(payload?.error || "Could not read the PDF rules file.");
+      }
+
+      setChatInput(payload.extractedText);
+      setRulesPdfStatus(payload.message || "PDF rules were extracted. Review the text, then send it to create the official draft.");
+    } catch (error) {
+      setRulesPdfStatus("");
+      setRulesError(error instanceof Error ? error.message : "Could not read the PDF rules file.");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   async function generateRuleDraft() {
@@ -1542,10 +1537,7 @@ export default function AdminPortal({
                 {t.back}
               </Link>
               <div className="mt-7 flex items-center gap-3">
-                <span className="gem-logo-mark flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/80 p-2">
-                  <Image src="/school-logo.png" alt="" width={42} height={42} className="object-contain" />
-                </span>
-                <p className="gem-eyebrow">GEMAI Admin</p>
+                <p className="gem-eyebrow">connected AI Admin</p>
               </div>
               <h1
                 className={`mt-5 text-3xl font-black tracking-tight text-slate-950 ${textAlignClass}`}
@@ -1625,13 +1617,10 @@ export default function AdminPortal({
               isSidebarCollapsed ? "flex-col" : ""
             }`}
           >
-            <div className="gem-logo-mark flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/80 p-2">
-              <Image src="/school-logo.png" alt="" width={36} height={36} className="object-contain" />
-            </div>
             {!isSidebarCollapsed ? (
               <div className={`min-w-0 ${textAlignClass}`}>
                 <p className="gem-eyebrow">
-                  GEMAI
+                  connected AI
                 </p>
                 <p className="mt-2 text-sm font-bold text-slate-950">
                   {t.adminLabel}
@@ -1840,6 +1829,31 @@ export default function AdminPortal({
                         {t.rules.addDescription}
                       </p>
 
+                      <div className="mt-5 rounded-[24px] border border-cyan-300/20 bg-cyan-300/10 p-5">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-200">
+                          PDF rules import
+                        </p>
+                        <p className="mt-3 text-sm leading-7 text-zinc-300">
+                          Upload a PDF with school rules. The configured AI key reads it,
+                          extracts the rule text, and places the result in the drafting box
+                          so you can review before changing anything official.
+                        </p>
+                        <label className="mt-4 inline-flex cursor-pointer items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/[0.1]">
+                          Upload PDF
+                          <input
+                            type="file"
+                            accept="application/pdf,.pdf"
+                            onChange={handleRulesPdfUpload}
+                            className="sr-only"
+                          />
+                        </label>
+                        {rulesPdfStatus ? (
+                          <p className="mt-3 text-sm leading-6 text-cyan-100">
+                            {rulesPdfStatus}
+                          </p>
+                        ) : null}
+                      </div>
+
                       <div className="mt-6 flex min-h-[520px] flex-col rounded-[26px] border border-white/10 bg-black/20 p-5">
                         <div className="flex-1 space-y-4 overflow-y-auto pr-1">
                           {chatMessages.length === 0 ? (
@@ -1859,7 +1873,7 @@ export default function AdminPortal({
                                 }`}
                               >
                                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300/80">
-                                  {message.role === "user" ? "Admin" : "GEMAI"}
+                                  {message.role === "user" ? "Admin" : "connected AI"}
                                 </p>
                                 <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-200">
                                   {message.content}
@@ -2495,7 +2509,7 @@ export default function AdminPortal({
             dir={textDirection}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-              GEMAI
+              connected AI
             </p>
             <h2
               id="rule-action-title"
@@ -2588,7 +2602,7 @@ export default function AdminPortal({
             dir={textDirection}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-              GEMAI
+              connected AI
             </p>
             <h2
               id="rule-edit-title"
@@ -2711,7 +2725,7 @@ export default function AdminPortal({
             dir={textDirection}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-              GEMAI
+              connected AI
             </p>
             <h2
               id="rule-delete-title"
@@ -2777,7 +2791,7 @@ export default function AdminPortal({
             dir={textDirection}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-              GEMAI
+              connected AI
             </p>
             <h2
               id="rule-restore-title"
@@ -2829,7 +2843,7 @@ export default function AdminPortal({
             dir={textDirection}
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300/80">
-              GEMAI
+              connected AI
             </p>
             <h2
               id="public-info-confirm-title"

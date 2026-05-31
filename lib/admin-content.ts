@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import { kv } from "@vercel/kv";
 
 import {
@@ -75,7 +73,7 @@ export type AdminContent = {
 
 type AdminPublicContent = Omit<AdminContent, "rules" | "schoolSchedule">;
 
-const LEGACY_RULES_PATH = path.join(process.cwd(), "data", "school_rules.txt");
+const RULES_RESET_AT = new Date("2026-05-20T00:00:00.000Z").getTime();
 const ADMIN_RULES_KEY = "admin_rules";
 const PUBLIC_INFO_KEY = "public_info";
 
@@ -87,50 +85,45 @@ const PUBLIC_INFO_KEYS: PublicInfoKey[] = [
   "programs",
 ];
 
+const SCHOOL_NAME = "1ere Ecole Officielle - Jbeil";
+const SCHOOL_PHONE = "09/540409";
+const SCHOOL_EMAIL = "Ecolefarhat@gmail.com";
+const SCHOOL_LOCATION = "4MC2+X2X, Byblos";
+const SCHOOL_MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=4MC2%2BX2X%2C%20Byblos";
+
 const DEFAULT_GRADE_SEEDS: Array<{
   id: string;
   className: string;
   ageRange?: string;
-}> = [
-  { id: "kg1", className: "Kindergarten 1", ageRange: "ages 3-4" },
-  { id: "kg2", className: "Kindergarten 2", ageRange: "ages 4-5" },
-  { id: "kg3", className: "Kindergarten 3", ageRange: "ages 5-6" },
-  { id: "grade-1", className: "Grade 1", ageRange: "ages 6-7" },
-  { id: "grade-2", className: "Grade 2", ageRange: "ages 7-8" },
-  { id: "grade-3", className: "Grade 3", ageRange: "ages 8-9" },
-  { id: "grade-4", className: "Grade 4", ageRange: "ages 9-10" },
-  { id: "grade-5", className: "Grade 5", ageRange: "ages 10-11" },
-  { id: "grade-6", className: "Grade 6", ageRange: "ages 11-12" },
-  { id: "grade-7", className: "Grade 7", ageRange: "ages 12-13" },
-  { id: "grade-8", className: "Grade 8", ageRange: "ages 13-14" },
-  { id: "grade-9", className: "Grade 9", ageRange: "ages 14-15" },
-  { id: "grade-10", className: "Grade 10", ageRange: "ages 15-16" },
-  { id: "grade-11", className: "Grade 11", ageRange: "ages 16-17" },
-  { id: "grade-12", className: "Grade 12", ageRange: "ages 17-18" },
-];
+}> = [];
 
 function nowIso() {
   return new Date().toISOString();
-}
-
-function readLegacyRulesText() {
-  try {
-    return fs.readFileSync(LEGACY_RULES_PATH, "utf8");
-  } catch {
-    return "";
-  }
 }
 
 function normalizeText(text: string) {
   return text.replace(/\r/g, "").trim();
 }
 
-function mergeTextBlocks(...parts: Array<string | undefined>) {
-  const nextParts = parts
-    .map((part) => normalizeText(part || ""))
-    .filter(Boolean);
+function replaceLegacyBranding(text: string) {
+  return text
+    .replace(/Collège des Sœurs du Rosaire Blat-Jbeil/g, SCHOOL_NAME)
+    .replace(/College des Soeurs du Rosaire Blat-Jbeil/g, SCHOOL_NAME)
+    .replace(/مدرسة راهبات الوردية بلاط - جبيل/g, SCHOOL_NAME)
+    .replace(/\+961 09 945 190/g, SCHOOL_PHONE)
+    .replace(/cs\.jbeil@rosaire\.edu\.lb/g, SCHOOL_EMAIL)
+    .replace(/Blat, Jbeil District, Mount Lebanon, Lebanon/g, SCHOOL_LOCATION)
+    .replace(/Blat, district de Jbeil, Mont-Liban, Liban/g, SCHOOL_LOCATION)
+    .replace(/بلاط، قضاء جبيل، جبل لبنان، لبنان/g, SCHOOL_LOCATION);
+}
 
-  return [...new Set(nextParts)].join("\n\n");
+function replaceLegacyLocalizedContent(content: LocalizedContent): LocalizedContent {
+  return {
+    en: replaceLegacyBranding(content.en),
+    fr: replaceLegacyBranding(content.fr),
+    ar: replaceLegacyBranding(content.ar),
+  };
 }
 
 export function inferCategory(text: string) {
@@ -181,22 +174,9 @@ export function deriveTitle(chunk: string, index: number) {
   return `Rule ${index + 1}`;
 }
 
-function buildRulesFromOriginalRulebook() {
-  const chunks = readLegacyRulesText()
-    .split(/\n\s*\n/)
-    .map((chunk) => normalizeText(chunk))
-    .filter(Boolean);
-  const timestamp = nowIso();
-
-  return chunks.map((chunk, index) => ({
-    id: `rule-${String(index + 1).padStart(3, "0")}`,
-    title: deriveTitle(chunk, index),
-    arabicText: chunk,
-    category: inferCategory(chunk),
-    createdAt: timestamp,
-    updatedAt: timestamp,
-    status: "published" as const,
-  }));
+function isLegacyRule(rule: AdminRule) {
+  const createdAt = Date.parse(rule.createdAt);
+  return Number.isFinite(createdAt) && createdAt < RULES_RESET_AT;
 }
 
 function createPublicInfoEntry(
@@ -223,9 +203,9 @@ function buildDefaultPublicInfo(): AdminPublicInfo {
         ar: "نظرة عامة على المدرسة",
       },
       {
-        en: "GEMAI supports the school with official information, clear communication, and practical guidance for families and visitors.",
-        fr: "GEMAI soutient l'ecole avec des informations officielles, une communication claire et des indications pratiques pour les familles et les visiteurs.",
-        ar: "تقدّم GEMAI معلومات مدرسية رسمية وتواصلًا واضحًا وإرشادًا عمليًا للعائلات والزوار.",
+        en: `connected AI supports ${SCHOOL_NAME} with official school information, clear communication, and practical guidance for families and visitors.`,
+        fr: `connected AI accompagne ${SCHOOL_NAME} avec des informations officielles, une communication claire et des indications pratiques pour les familles et les visiteurs.`,
+        ar: `تقدّم connected AI معلومات مدرسية رسمية وتواصلًا واضحًا وإرشادًا عمليًا للعائلات والزوار في ${SCHOOL_NAME}.`,
       },
     ),
     contact: createPublicInfoEntry(
@@ -236,9 +216,9 @@ function buildDefaultPublicInfo(): AdminPublicInfo {
         ar: "معلومات التواصل",
       },
       {
-        en: "Phone: +961 09 945 190\nEmail: cs.jbeil@rosaire.edu.lb\nLocation: Blat, Jbeil District, Mount Lebanon, Lebanon.",
-        fr: "Telephone : +961 09 945 190\nE-mail : cs.jbeil@rosaire.edu.lb\nLieu : Blat, district de Jbeil, Mont-Liban, Liban.",
-        ar: "الهاتف: +961 09 945 190\nالبريد الالكتروني: cs.jbeil@rosaire.edu.lb\nالموقع: بلاط، قضاء جبيل، جبل لبنان، لبنان.",
+        en: `Phone: ${SCHOOL_PHONE}\nEmail: ${SCHOOL_EMAIL}\nLocation: ${SCHOOL_LOCATION}\nGoogle Maps: ${SCHOOL_MAPS_URL}`,
+        fr: `Telephone : ${SCHOOL_PHONE}\nE-mail : ${SCHOOL_EMAIL}\nLieu : ${SCHOOL_LOCATION}\nGoogle Maps : ${SCHOOL_MAPS_URL}`,
+        ar: `الهاتف: ${SCHOOL_PHONE}\nالبريد الالكتروني: ${SCHOOL_EMAIL}\nالموقع: ${SCHOOL_LOCATION}\nخرائط Google: ${SCHOOL_MAPS_URL}`,
       },
     ),
     officeHours: createPublicInfoEntry(
@@ -249,9 +229,9 @@ function buildDefaultPublicInfo(): AdminPublicInfo {
         ar: "ساعات الدوام",
       },
       {
-        en: "The school day begins at 7:35 AM and ends at 2:40 PM. Visitors should confirm administrative office availability before coming.",
-        fr: "La journee scolaire commence a 7h35 et se termine a 14h40. Les visiteurs devraient confirmer les horaires du bureau administratif avant de venir.",
-        ar: "يبدأ الدوام المدرسي عند الساعة 7:35 صباحا وينتهي عند الساعة 2:40 بعد الظهر. يفضّل على الزوار تأكيد دوام الإدارة قبل الحضور.",
+        en: "Please contact the school office to confirm current administrative hours before visiting.",
+        fr: "Veuillez contacter le bureau de l'ecole pour confirmer les horaires administratifs avant votre visite.",
+        ar: "يرجى التواصل مع مكتب المدرسة لتأكيد ساعات الدوام الإداري الحالية قبل الزيارة.",
       },
     ),
     tuition: createPublicInfoEntry(
@@ -262,9 +242,9 @@ function buildDefaultPublicInfo(): AdminPublicInfo {
         ar: "الاقساط",
       },
       {
-        en: "Public tuition details can be published here whenever the school wants families to review official fee guidance.",
-        fr: "Les details publics des frais de scolarite peuvent etre publies ici lorsque l'ecole souhaite partager des indications officielles avec les familles.",
-        ar: "يمكن نشر تفاصيل الاقساط هنا عندما ترغب المدرسة في مشاركة توضيحات رسمية مع العائلات.",
+        en: "Tuition details are not published yet. Please contact the school office for current information.",
+        fr: "Les frais de scolarite ne sont pas encore publies. Veuillez contacter le bureau de l'ecole pour les informations actuelles.",
+        ar: "لم تُنشر تفاصيل الأقساط بعد. يرجى التواصل مع مكتب المدرسة للحصول على المعلومات الحالية.",
       },
     ),
     programs: createPublicInfoEntry(
@@ -275,9 +255,9 @@ function buildDefaultPublicInfo(): AdminPublicInfo {
         ar: "البرامج",
       },
       {
-        en: "This section can describe the curriculum, learning tracks, and official programs followed by the school.",
-        fr: "Cette section peut decrire le cursus, les parcours d'apprentissage et les programmes officiels suivis par l'ecole.",
-        ar: "يمكن أن يشرح هذا القسم المنهج المعتمد والمسارات التعليمية والبرامج الرسمية التي تتبعها المدرسة.",
+        en: "Program details can be published by the administration when ready.",
+        fr: "Les details des programmes pourront etre publies par l'administration lorsqu'ils seront prets.",
+        ar: "يمكن للإدارة نشر تفاصيل البرامج عندما تصبح جاهزة.",
       },
     ),
   };
@@ -294,29 +274,7 @@ function buildDefaultGradeInfo(): GradePublicInfo[] {
     tuitionCurrency: "USD",
     stationeryAmount: String(90 + index * 8),
     stationeryCurrency: "USD",
-    books: [
-      {
-        id: `${grade.id}-book-1`,
-        name: `${grade.className} Arabic Reader`,
-        status: "active" as const,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
-      {
-        id: `${grade.id}-book-2`,
-        name: `${grade.className} Mathematics Workbook`,
-        status: "active" as const,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
-      {
-        id: `${grade.id}-book-3`,
-        name: `${grade.className} Science Notebook`,
-        status: "active" as const,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
-    ],
+    books: [],
     updatedAt: timestamp,
   }));
 }
@@ -419,35 +377,31 @@ function sanitizePublicInfo(rawPublicInfo: unknown): AdminPublicInfo {
     overview: createPublicInfoEntry(
       "overview",
       defaults.overview.title,
-      overviewEntry?.content ?? defaults.overview.content,
+      replaceLegacyLocalizedContent(overviewEntry?.content ?? defaults.overview.content),
       overviewEntry?.updatedAt ?? defaults.overview.updatedAt,
     ),
     contact: createPublicInfoEntry(
       "contact",
       defaults.contact.title,
-      {
-        en: mergeTextBlocks(contactEntry?.content.en, locationEntry?.content.en) || defaults.contact.content.en,
-        fr: mergeTextBlocks(contactEntry?.content.fr, locationEntry?.content.fr) || defaults.contact.content.fr,
-        ar: mergeTextBlocks(contactEntry?.content.ar, locationEntry?.content.ar) || defaults.contact.content.ar,
-      },
+      defaults.contact.content,
       latestContactTimestamp ?? defaults.contact.updatedAt,
     ),
     officeHours: createPublicInfoEntry(
       "officeHours",
       defaults.officeHours.title,
-      officeHoursEntry?.content ?? defaults.officeHours.content,
+      replaceLegacyLocalizedContent(officeHoursEntry?.content ?? defaults.officeHours.content),
       officeHoursEntry?.updatedAt ?? defaults.officeHours.updatedAt,
     ),
     tuition: createPublicInfoEntry(
       "tuition",
       defaults.tuition.title,
-      tuitionEntry?.content ?? defaults.tuition.content,
+      replaceLegacyLocalizedContent(tuitionEntry?.content ?? defaults.tuition.content),
       tuitionEntry?.updatedAt ?? defaults.tuition.updatedAt,
     ),
     programs: createPublicInfoEntry(
       "programs",
       defaults.programs.title,
-      programsEntry?.content ?? defaults.programs.content,
+      replaceLegacyLocalizedContent(programsEntry?.content ?? defaults.programs.content),
       programsEntry?.updatedAt ?? defaults.programs.updatedAt,
     ),
   };
@@ -513,6 +467,11 @@ function sanitizeGradeInfo(
   fallbackGradeInfo: GradePublicInfo[] = buildDefaultGradeInfo(),
 ): GradePublicInfo[] {
   const defaults = buildDefaultGradeInfo();
+
+  if (Array.isArray(rawGradeInfo) && rawGradeInfo.length === 0) {
+    return [];
+  }
+
   const fallbackById = new Map(
     fallbackGradeInfo
       .filter((entry): entry is GradePublicInfo => !!entry && typeof entry === "object")
@@ -617,13 +576,15 @@ async function readAdminRules() {
     const rules = await kv.get<AdminRule[]>(ADMIN_RULES_KEY);
 
     if (Array.isArray(rules) && rules.length > 0) {
-      return rules.map(sanitizeRule);
+      const currentRules = rules.map(sanitizeRule).filter((rule) => !isLegacyRule(rule));
+
+      if (currentRules.length !== rules.length) {
+        await kv.set(ADMIN_RULES_KEY, currentRules);
+      }
+
+      return currentRules;
     }
-
-    const seededRules = buildRulesFromOriginalRulebook().map(sanitizeRule);
-    await kv.set(ADMIN_RULES_KEY, seededRules);
-
-    return seededRules;
+    return [];
   } catch {
     return [];
   }
@@ -702,14 +663,14 @@ export async function getPublishedRules() {
 }
 
 export function getOriginalRulebookText() {
-  return readLegacyRulesText();
+  return "";
 }
 
 export async function getPublishedRulesText() {
   const publishedRules = await getPublishedRules();
 
   if (publishedRules.length === 0) {
-    return readLegacyRulesText();
+    return "";
   }
 
   return publishedRules.map((rule) => rule.arabicText).join("\n\n");
@@ -745,8 +706,9 @@ export async function getGuestPublicInfoContext(mode: string) {
     return publicInfoText;
   }
 
-  const gradeTuitionText = content.gradeInfo
-    .map((grade) => {
+  const gradeTuitionText = content.gradeInfo.length === 0
+    ? "No grade tuition, stationery, class, schedule, teacher, or book details are currently published."
+    : content.gradeInfo.map((grade) => {
       const activeBooks = grade.books
         .filter((book) => book.status === "active")
         .map((book) => `- ${book.name}`)
@@ -762,8 +724,7 @@ export async function getGuestPublicInfoContext(mode: string) {
       ]
         .filter(Boolean)
         .join("\n");
-    })
-    .join("\n\n");
+    }).join("\n\n");
 
   return [
     publicInfoText,

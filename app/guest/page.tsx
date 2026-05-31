@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -61,8 +60,8 @@ const EMPTY_CHATS: Record<Mode, Message[]> = {
 const TRANSLATIONS: Record<Language, TranslationSet> = {
   en: {
     portalTitle: "Guest Portal",
-    gemaiShort: "GEMAI",
-    back: "Back to GEMAI",
+    gemaiShort: "connected AI",
+    back: "Back to connected AI",
     you: "You",
     assistant: "AI",
     send: "Send",
@@ -143,8 +142,8 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
   },
   fr: {
     portalTitle: "Portail Visiteur",
-    gemaiShort: "GEMAI",
-    back: "Retour a GEMAI",
+    gemaiShort: "connected AI",
+    back: "Retour a connected AI",
     you: "Vous",
     assistant: "IA",
     send: "Envoyer",
@@ -225,8 +224,8 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
   },
   ar: {
     portalTitle: "بوابة الزائر",
-    gemaiShort: "GEMAI",
-    back: "العودة إلى GEMAI",
+    gemaiShort: "connected AI",
+    back: "العودة إلى connected AI",
     you: "أنت",
     assistant: "AI",
     send: "إرسال",
@@ -612,9 +611,6 @@ function GuestPageContent() {
           >
             <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4">
               <div className={`${sidebarOpen ? "flex" : "hidden"} min-w-0 items-center gap-3`}>
-                <span className="gem-logo-mark flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/80 p-2">
-                  <Image src="/school-logo.png" alt="" width={32} height={32} className="object-contain" />
-                </span>
                 <div className={`min-w-0 ${textAlignClass}`} dir={textDirection}>
                   <p className="gem-eyebrow">{translation.gemaiShort}</p>
                   <h1 className="mt-1 text-base font-bold text-slate-950">
@@ -622,12 +618,6 @@ function GuestPageContent() {
                   </h1>
                 </div>
               </div>
-
-              {!sidebarOpen && (
-                <div className="gem-logo-mark mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-white/80 p-2">
-                  <Image src="/school-logo.png" alt="" width={30} height={30} className="object-contain" />
-                </div>
-              )}
 
               <button
                 type="button"
@@ -693,7 +683,6 @@ function GuestPageContent() {
           </aside>
 
           <main className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-white/35">
-            <Image src="/school-logo.png" alt="" width={360} height={360} className="gem-watermark absolute right-10 top-24 hidden object-contain lg:block" aria-hidden="true" />
             <header className="relative z-10 shrink-0 border-b border-blue-900/10 bg-white/55 px-5 py-4 backdrop-blur-xl sm:px-7">
               <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4">
                 <div className={`min-w-0 ${textAlignClass}`} dir={textDirection}>

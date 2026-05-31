@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -171,8 +170,8 @@ const SCHEDULE_TEXT: Record<
 const TRANSLATIONS: Record<Language, TranslationSet> = {
   en: {
     portalTitle: "Teacher Portal",
-    gemaiShort: "GEMAI",
-    back: "Back to GEMAI",
+    gemaiShort: "connected AI",
+    back: "Back to connected AI",
     you: "You",
     assistant: "AI",
     send: "Send",
@@ -191,7 +190,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "AI teaching support",
         title: "Plan a classroom activity",
         description:
-          "Ask for activities, lesson structures, discussion formats, or classroom exercises and GEMAI will help you shape them into practical teaching plans.",
+          "Ask for activities, lesson structures, discussion formats, or classroom exercises and connected AI will help you shape them into practical teaching plans.",
         placeholder: "Describe the activity you want to build...",
         suggestions: [
           "Plan a biology group activity.",
@@ -208,7 +207,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         sidebarNote: "Grade boosting",
         title: "Support student performance and classroom engagement",
         description:
-          "Ask about grades, focus, engagement, classroom atmosphere, or support for struggling students and GEMAI will help you think through practical and fair teaching strategies.",
+          "Ask about grades, focus, engagement, classroom atmosphere, or support for struggling students and connected AI will help you think through practical and fair teaching strategies.",
         placeholder:
           "Ask about grades, focus, engagement, or classroom improvement...",
         suggestions: [
@@ -234,8 +233,8 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
   },
   fr: {
     portalTitle: "Portail Enseignant",
-    gemaiShort: "GEMAI",
-    back: "Retour a GEMAI",
+    gemaiShort: "connected AI",
+    back: "Retour a connected AI",
     you: "Vous",
     assistant: "IA",
     send: "Envoyer",
@@ -254,7 +253,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "Accompagnement pédagogique par IA",
         title: "Planifier une activité de classe",
         description:
-          "Demandez une activité, une structure de séance, un format d’échange ou un exercice de classe, et GEMAI vous aidera à en faire un plan concret et exploitable.",
+          "Demandez une activité, une structure de séance, un format d’échange ou un exercice de classe, et connected AI vous aidera à en faire un plan concret et exploitable.",
         placeholder: "Décrivez l’activité que vous souhaitez construire...",
         suggestions: [
           "Planifie une activité de groupe en biologie.",
@@ -271,7 +270,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "Soutien pédagogique et scolaire",
         title: "Améliorer les performances et l’engagement en classe",
         description:
-          "Posez des questions sur les notes, la concentration, l’engagement, l’ambiance de classe ou le soutien aux élèves en difficulté, et GEMAI vous aidera avec des pistes concrètes et équilibrées.",
+          "Posez des questions sur les notes, la concentration, l’engagement, l’ambiance de classe ou le soutien aux élèves en difficulté, et connected AI vous aidera avec des pistes concrètes et équilibrées.",
         placeholder:
           "Posez une question sur les notes, la concentration, l’engagement ou l’amélioration de la classe...",
         suggestions: [
@@ -297,8 +296,8 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
   },
   ar: {
     portalTitle: "بوابة المعلّم",
-    gemaiShort: "GEMAI",
-    back: "العودة إلى GEMAI",
+    gemaiShort: "connected AI",
+    back: "العودة إلى connected AI",
     you: "أنت",
     assistant: "AI",
     send: "إرسال",
@@ -317,7 +316,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "دعم تعليمي بالذكاء الاصطناعي",
         title: "خطّط لنشاط صفي",
         description:
-          "اطلب نشاطًا، أو هيكل حصة، أو صيغة نقاش، أو تمرينًا صفيًا، وسيساعدك GEMAI على تحويله إلى خطة عملية واضحة.",
+          "اطلب نشاطًا، أو هيكل حصة، أو صيغة نقاش، أو تمرينًا صفيًا، وسيساعدك connected AI على تحويله إلى خطة عملية واضحة.",
         placeholder: "صف النشاط الذي تريد بناءه...",
         suggestions: [
           "خطّط لنشاط جماعي في الأحياء.",
@@ -333,7 +332,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "دعم تعليمي وسلوكي",
         title: "تحسين أداء الطلاب وتفاعلهم داخل الصف",
         description:
-          "اسأل عن الدرجات، أو التركيز، أو التفاعل، أو أجواء الصف، أو دعم الطلاب الضعفاء، وسيساعدك GEMAI باقتراحات عملية ومتوازنة.",
+          "اسأل عن الدرجات، أو التركيز، أو التفاعل، أو أجواء الصف، أو دعم الطلاب الضعفاء، وسيساعدك connected AI باقتراحات عملية ومتوازنة.",
         placeholder:
           "اسأل عن الدرجات، أو التركيز، أو التفاعل، أو تحسين الصف...",
         suggestions: [
@@ -735,9 +734,6 @@ function TeacherPageContent() {
           >
             <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4">
               <div className={`${sidebarOpen ? "flex" : "hidden"} min-w-0 items-center gap-3`}>
-                <span className="gem-logo-mark flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/80 p-2">
-                  <Image src="/school-logo.png" alt="" width={32} height={32} className="object-contain" />
-                </span>
                 <div className={`min-w-0 ${textAlignClass}`} dir={textDirection}>
                   <p className="gem-eyebrow">{translation.gemaiShort}</p>
                   <h1 className="mt-1 text-base font-bold text-slate-950">
@@ -745,12 +741,6 @@ function TeacherPageContent() {
                   </h1>
                 </div>
               </div>
-
-              {!sidebarOpen && (
-                <div className="gem-logo-mark mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-white/80 p-2">
-                  <Image src="/school-logo.png" alt="" width={30} height={30} className="object-contain" />
-                </div>
-              )}
 
               <button
                 type="button"
@@ -821,7 +811,6 @@ function TeacherPageContent() {
           </aside>
 
           <main className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-white/35">
-            <Image src="/school-logo.png" alt="" width={360} height={360} className="gem-watermark absolute right-10 top-24 hidden object-contain lg:block" aria-hidden="true" />
             <header className="relative z-10 shrink-0 border-b border-blue-900/10 bg-white/55 px-5 py-4 backdrop-blur-xl sm:px-7">
               <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4">
                 <div className={`min-w-0 ${textAlignClass}`} dir={textDirection}>

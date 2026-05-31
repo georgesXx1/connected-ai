@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -48,8 +47,8 @@ const STORAGE_KEY = "gemai-language";
 const TRANSLATIONS: Record<Language, TranslationSet> = {
   en: {
     portalTitle: "Student Portal",
-    gemaiShort: "GEMAI",
-    back: "Back to GEMAI",
+    gemaiShort: "connected AI",
+    back: "Back to connected AI",
     you: "You",
     assistant: "AI",
     send: "Send",
@@ -84,7 +83,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "Practical next-step support",
         title: "Talk through a student situation",
         description:
-          "Describe what happened and GEMAI will help you think through the best action, the risks, and the clearest next step.",
+          "Describe what happened and connected AI will help you think through the best action, the risks, and the clearest next step.",
         placeholder: "Describe your situation...",
         suggestions: [
           "I missed an exam because I was sick for two days.",
@@ -98,8 +97,8 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
   },
   fr: {
     portalTitle: "Portail Élève",
-    gemaiShort: "GEMAI",
-    back: "Retour a GEMAI",
+    gemaiShort: "connected AI",
+    back: "Retour a connected AI",
     you: "Vous",
     assistant: "IA",
     send: "Envoyer",
@@ -134,7 +133,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "Aide concrète pour la suite",
         title: "Parler d'une situation d'élève",
         description:
-          "Décrivez ce qui s'est passé et GEMAI vous aidera à réfléchir à la meilleure action, aux risques et à l'étape suivante la plus claire.",
+          "Décrivez ce qui s'est passé et connected AI vous aidera à réfléchir à la meilleure action, aux risques et à l'étape suivante la plus claire.",
         placeholder: "Décrivez votre situation...",
         suggestions: [
           "J'ai manqué un examen parce que j'étais malade pendant deux jours.",
@@ -148,8 +147,8 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
   },
   ar: {
     portalTitle: "بوابة الطالب",
-    gemaiShort: "GEMAI",
-    back: "العودة إلى GEMAI",
+    gemaiShort: "connected AI",
+    back: "العودة إلى connected AI",
     you: "أنت",
     assistant: "AI",
     send: "إرسال",
@@ -184,7 +183,7 @@ const TRANSLATIONS: Record<Language, TranslationSet> = {
         eyebrow: "دعم عملي للخطوة التالية",
         title: "تحدّث عن موقف طلابي",
         description:
-          "صف ما حدث وسيساعدك GEMAI على التفكير في أفضل إجراء، والمخاطر، والخطوة التالية الأكثر وضوحًا.",
+          "صف ما حدث وسيساعدك connected AI على التفكير في أفضل إجراء، والمخاطر، والخطوة التالية الأكثر وضوحًا.",
         placeholder: "صف حالتك...",
         suggestions: [
           "فاتني امتحان لأنني كنت مريضًا لمدة يومين.",
@@ -482,9 +481,6 @@ function StudentPageContent() {
           >
             <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4">
               <div className={`${sidebarOpen ? "flex" : "hidden"} min-w-0 items-center gap-3`}>
-                <span className="gem-logo-mark flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/80 p-2">
-                  <Image src="/school-logo.png" alt="" width={32} height={32} className="object-contain" />
-                </span>
                 <div className={`min-w-0 ${textAlignClass}`} dir={textDirection}>
                   <p className="gem-eyebrow">{translation.gemaiShort}</p>
                   <h1 className="mt-1 text-base font-bold text-slate-950">
@@ -492,12 +488,6 @@ function StudentPageContent() {
                   </h1>
                 </div>
               </div>
-
-              {!sidebarOpen && (
-                <div className="gem-logo-mark mx-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-white/80 p-2">
-                  <Image src="/school-logo.png" alt="" width={30} height={30} className="object-contain" />
-                </div>
-              )}
 
               <button
                 type="button"
@@ -563,7 +553,6 @@ function StudentPageContent() {
           </aside>
 
           <main className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-white/35">
-            <Image src="/school-logo.png" alt="" width={360} height={360} className="gem-watermark absolute right-10 top-24 hidden object-contain lg:block" aria-hidden="true" />
             <header className="relative z-10 shrink-0 border-b border-blue-900/10 bg-white/55 px-5 py-4 backdrop-blur-xl sm:px-7">
               <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4">
                 <div className={`min-w-0 ${textAlignClass}`} dir={textDirection}>

@@ -1,8 +1,4 @@
-import {
-  getOriginalRulebookText,
-  getPublishedRules,
-  type AdminRule,
-} from "@/lib/admin-content";
+import { getPublishedRules, type AdminRule } from "@/lib/admin-content";
 
 type Concept = {
   name: string;
@@ -393,16 +389,10 @@ export async function getSchoolRulesText() {
   const dynamicRulesText = publishedRules
     .map((rule) => formatPublishedRuleForContext(rule))
     .join("\n\n");
-  const rulebookText = getOriginalRulebookText();
 
   return `
-UPDATED SCHOOL RULES (HIGHEST PRIORITY):
-${dynamicRulesText || "No updated published rules are currently available."}
-
---------------------------------------
-
-OFFICIAL RULEBOOK:
-${rulebookText}
+CURRENT PUBLISHED SCHOOL RULES:
+${dynamicRulesText || "No school rules are currently published."}
   `.trim();
 }
 
@@ -525,17 +515,7 @@ async function getSearchableRuleChunks(): Promise<SearchableRuleChunk[]> {
     )
     .filter((chunk) => chunk.text.length > 0);
 
-  const rulebookChunks = getOriginalRulebookText()
-    .split(/\n\s*\n/)
-    .map((chunk) => chunk.trim())
-    .filter((chunk) => chunk.length > 0)
-    .map((chunk) => ({
-      text: chunk,
-      searchableText: chunk,
-      source: "rulebook" as const,
-    }));
-
-  return [...updatedChunks, ...rulebookChunks];
+  return updatedChunks;
 }
 
 export async function getSchoolRulesChunks() {

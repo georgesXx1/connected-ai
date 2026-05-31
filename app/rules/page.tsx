@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { getPublishedRules, type AdminRule } from "@/lib/admin-content";
 
@@ -20,8 +19,8 @@ const TRANSLATIONS = {
   en: {
     title: "Official School Rules",
     subtitle:
-      "Published rules only. This page is view-only and reflects the current official rule set used by GEMAI.",
-    back: "Back to GEMAI",
+      "Published rules only. This page is view-only and reflects the current official rule set used by connected AI.",
+    back: "Back to connected AI",
     filter: "Category",
     allCategories: "All categories",
     sort: "Sort",
@@ -33,8 +32,8 @@ const TRANSLATIONS = {
   fr: {
     title: "Regles officielles de l'ecole",
     subtitle:
-      "Cette page affiche uniquement les regles publiees. Elle est en consultation seule et reflète l'ensemble officiel utilise par GEMAI.",
-    back: "Retour a GEMAI",
+      "Cette page affiche uniquement les regles publiees. Elle est en consultation seule et reflète l'ensemble officiel utilise par connected AI.",
+    back: "Retour a connected AI",
     filter: "Categorie",
     allCategories: "Toutes les categories",
     sort: "Tri",
@@ -46,8 +45,8 @@ const TRANSLATIONS = {
   ar: {
     title: "القوانين المدرسية الرسمية",
     subtitle:
-      "تعرض هذه الصفحة القوانين المنشورة فقط. وهي مخصّصة للعرض وتعكس مجموعة القوانين الرسمية الحالية المستخدمة في GEMAI.",
-    back: "العودة إلى GEMAI",
+      "تعرض هذه الصفحة القوانين المنشورة فقط. وهي مخصّصة للعرض وتعكس مجموعة القوانين الرسمية الحالية المستخدمة في connected AI.",
+    back: "العودة إلى connected AI",
     filter: "الفئة",
     allCategories: "كل الفئات",
     sort: "الترتيب",
@@ -124,15 +123,11 @@ export default async function RulesPage({ searchParams }: RulesPageProps) {
     >
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10">
         <div className="gem-shell relative overflow-hidden rounded-[30px]">
-          <Image src="/school-logo.png" alt="" width={420} height={420} className="gem-watermark absolute -right-16 top-6 hidden object-contain lg:block" aria-hidden="true" />
           <section className="relative border-b border-blue-900/10 px-6 py-8 sm:px-8 lg:px-10">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className={textAlignClass}>
                 <div className="flex items-center gap-3">
-                  <span className="gem-logo-mark flex h-12 w-12 items-center justify-center rounded-2xl border border-white/80 p-2">
-                    <Image src="/school-logo.png" alt="" width={36} height={36} className="object-contain" />
-                  </span>
-                  <p className="gem-eyebrow">GEMAI</p>
+                  <p className="gem-eyebrow">connected AI</p>
                 </div>
                 <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
                   {t.title}

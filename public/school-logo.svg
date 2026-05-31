@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 980" role="img" aria-labelledby="title desc">
+  <title id="title">1ere Ecole Officielle - Jbeil logo</title>
+  <desc id="desc">Circular school logo with an anchor-shaped F mark.</desc>
+  <defs>
+    <path id="school-name-path" d="M 112 402 A 248 248 0 1 1 608 402" />
+    <style>
+      .ring { fill: none; stroke: #8d8f93; stroke-width: 76; }
+      .name { fill: #ffffff; font: 700 43px Arial, Helvetica, sans-serif; letter-spacing: 2px; }
+      .mark { fill: none; stroke: #284e70; stroke-width: 50; stroke-linecap: round; stroke-linejoin: round; }
+      .mark-thin { fill: none; stroke: #cbd5df; stroke-width: 8; stroke-linecap: round; }
+      .anchor-fill { fill: #284e70; }
+    </style>
+  </defs>
+
+  <rect width="720" height="980" fill="#ffffff" />
+  <circle cx="360" cy="402" r="248" class="ring" />
+  <text class="name">
+    <textPath href="#school-name-path" startOffset="50%" text-anchor="middle">
+      1&#232;re Ecole Officielle - Jbeil
+    </textPath>
+  </text>
+
+  <path class="mark" d="M 476 402 H 360 V 632" />
+  <path class="mark" d="M 360 402 C 320 460 264 496 232 512" />
+  <path class="mark" d="M 360 632 H 476" />
+  <path class="mark" d="M 360 632 V 790" />
+  <path class="mark-thin" d="M 345 480 V 720 C 345 782 306 806 260 784" />
+
+  <path class="anchor-fill" d="M360 890 292 820h136z" />
+  <path class="mark" d="M 232 728 C 230 808 280 858 360 858 C 440 858 490 808 488 728" />
+  <path class="mark" d="M 232 728 L 196 812" />
+  <path class="mark" d="M 488 728 L 524 812" />
+  <path class="anchor-fill" d="M150 694 224 730 159 769z" />
+  <path class="anchor-fill" d="M570 694 496 730 561 769z" />
+</svg>
