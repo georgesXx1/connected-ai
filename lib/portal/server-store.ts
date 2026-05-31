@@ -1,6 +1,8 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import { kv } from "@vercel/kv";
+
 import {
   agendaItems,
   announcements,
@@ -64,6 +66,38 @@ export type ServerPortalData = {
 };
 
 const portalDataPath = path.join(process.cwd(), "data", "portal-data.json");
+const portalDataKvKey = "school-portal-data";
+
+function hasKvConfig() {
+  return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
+
+async function readKvPortalData() {
+  if (!hasKvConfig()) {
+    return null;
+  }
+
+  try {
+    return await kv.get<ServerPortalData>(portalDataKvKey);
+  } catch (error) {
+    console.error("Unable to read portal data from Vercel KV.", error);
+    return null;
+  }
+}
+
+async function writeKvPortalData(data: ServerPortalData) {
+  if (!hasKvConfig()) {
+    return false;
+  }
+
+  try {
+    await kv.set(portalDataKvKey, data);
+    return true;
+  } catch (error) {
+    console.error("Unable to write portal data to Vercel KV.", error);
+    return false;
+  }
+}
 
 function cloneArray<T>(items: T[]) {
   return items.map((item) => ({ ...item }));
@@ -237,6 +271,14 @@ export function mergeServerPortalData(
 }
 
 export async function readServerPortalData() {
+  const kvData = await readKvPortalData();
+
+  if (kvData) {
+    const merged = { ...defaultPortalData(), ...kvData };
+    applyPortalDataToMemory(merged);
+    return merged;
+  }
+
   try {
     const raw = await fs.readFile(portalDataPath, "utf8");
     const data = JSON.parse(raw) as ServerPortalData;
@@ -262,7 +304,16 @@ export async function writeServerPortalData(data: ServerPortalData) {
     },
   };
   merged.users.forEach((user) => ensureProfileForUser(merged, user));
-  await fs.mkdir(path.dirname(portalDataPath), { recursive: true });
-  await fs.writeFile(portalDataPath, JSON.stringify(merged, null, 2));
   applyPortalDataToMemory(merged);
+
+  if (await writeKvPortalData(merged)) {
+    return;
+  }
+
+  try {
+    await fs.mkdir(path.dirname(portalDataPath), { recursive: true });
+    await fs.writeFile(portalDataPath, JSON.stringify(merged, null, 2));
+  } catch (error) {
+    console.error("Unable to write portal data to the local filesystem.", error);
+  }
 }
